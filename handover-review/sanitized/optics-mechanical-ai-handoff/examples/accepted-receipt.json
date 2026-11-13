@@ -1,0 +1,1 @@
+{"artifact_sha256":"fbd1507f1a0c32dd1da1a31deb5ca822fd28740d302605a9a0d1469214633ef3","checks":{"mechanical_proxy":true,"optical_proxy":true,"protocol":true,"same_plan":true},"motions_sent":0,"physical_verified":false,"plan_hash":"d378c1f2f14b8f2018feb7354dd7f6574dd41059e2641f7c71f64ff892281640","source":"algorithm_v1","status":"accepted_dry_run"}

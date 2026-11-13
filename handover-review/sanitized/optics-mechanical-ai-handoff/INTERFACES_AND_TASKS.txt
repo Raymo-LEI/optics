@@ -1,0 +1,53 @@
+Interfaces and work boundaries / 2026-11-13
+
+A. Main line that does not change
+Input/Vision → Prompt → Act → Validator → Controller → Sim → Output → Mode → Execution → Done.
+On failure, feedback_router returns to the node indicated by the evidence. Keep the original failure, the agent decision, the plan, the simulation evidence, and the acceptance result. The formal baseline is the two files in references/ from pinned commit 8ff05a0d8ff98328ad3837ac167787bdba669649. Do not claim that this matches a later revision of the upstream repository.
+
+B. Order for reading the code (paths are inside optics-langgraph)
+1 optics_graph/runtime.py: run, checkpoint, persistence, pause and continue. server.py: HTTP entry and local-access protection.
+2 optics_graph/team_flow.py: StateGraph, conditional edges, failure classification, bounded rollback, and the stage journal.
+3 optics_graph/algorithm_sim.py: AlgorithmOptions, Action, and AlgorithmPlan. The current execution stand-in, independent recomputation, and same-plan handoff.
+4 optics_graph/agent_algorithm.py: how the real design and repair agents attach to each node.
+5 optics_graph/design_agent.py: Repair output shape and the repair() prompt. gateway.py: model requests and recovery.
+6 optics_graph/team_artifacts.py: JSON, ZIP, and hashes. sim_io.py: strict reads.
+7 optics_graph/team_services.py: reference for the existing file-job adapter. It does not mean the algorithm branch already uses one HTTP Job API.
+8 optics_graph/panel.html: graph, feedback, rounds, and the English display.
+
+C. The data boundary that is real today
+Vision: algorithm_state.current → prob, including schema_version=algorithm-observation/v1, source=algorithm_v1, camera_measured=false, frame_id, world_revision, and observations. This is algorithm state, not a calibrated camera result.
+Act: the target layout is stored separately from the current bench. A target component has object_id, movable, and target_pose, in metres and a quaternion. The algorithm adapter ultimately uses only position and yaw. Do not pretend this is full 6D pose control.
+Controller: input is current, target, the latest failure, and the authorized component id. Output is an AlgorithmPlan. See schemas/algorithm-plan.schema.json, exported from the current Pydantic classes. Fields include scene_revision, frame_id=optical_table, position_unit=m, angle_unit=rad, world_revision, hashes of current, target, assumptions, and experiment, phase, allowed_object_ids, and actions.
+Action: object_id, operation=place/translate/align, delta_position_m[3], delta_yaw_rad. The first assembly, phase=assembly, may cover authorized movable components. After the bench exists, a repair may have only one authorized component and one action.
+Repair agent: Repair(operation=translate/align/verify/stop, object_id, reason). See schemas/repair.schema.json. AgentAlgorithmServices.local_repair currently accepts only the translate or align expected at this layer. verify is in the output schema, but there is no complete read-only recovery branch yet. Regrasp and path replanning are not supported actions. A new capability needs a service, validation, and a test. Adding a string is not enough.
+Sim: executes the bound plan and writes artifact.zip with exactly plan.json, manifest.json, and result.json. result records before, after, revision, moved_ids, errors, assumptions, and physical_verified=false. The current source is algorithm_v1. It is not collision or dynamics evidence.
+Output: checks the ZIP, source, hashes, current state, and action effect, including position and angle proxy values and the target analytic tests. Analytic tests are computed from the target design. They are not a wave-optics recomputation after execution.
+Execution: accepts only the accepted original plan bytes and returns accepted_dry_run with motions_sent=0. It is not a hardware service. If real execution fails or the receipt is unknown, do not automatically send the motion again.
+
+D. Differences from the team's formal interface (to be adapted, not already implemented)
+Local algorithm-rosi/v1 is an incremental pose action. It is not the team's final ROSi or a ROS 2 trajectory. Formal planning, simulation, and execution must share robot_model_id, calibration_id, tool_frame, waypoints, limits, and plan_hash. The control group confirms the final ROSi format. Renaming a schema does not mean hardware is connected.
+Draft service API: POST /v1/jobs, GET /v1/jobs/{id}, /healthz, /version, /openapi.json. The current code has a direct local call and a file-job adapter. Idempotency keys, cancellation, status queries, and timeout recovery for the HTTP service still have to be implemented and shown.
+A later real current layout must come from calibrated observation. First obtain the actual agreement for camera, robot, and tool frames, units, robot model, and calibration version. Do not guess the transform. For now, use an algorithm observation with an explicit source mark.
+
+E. Suggested delivery order and acceptance
+P0 Run the current baseline: follow START_HERE for the demo and the regression, and say which runs use a model stand-in and which call a real API. Do not treat replay as general design.
+P1 Mechanical service adapter: keep the algorithm implementation, define replaceable planner, sim, and executor boundaries, and independently test that the same request is not executed twice, that a mismatched service version, frame, or calibration is rejected, and that the result stays bound to the plan. Do not add a web control that lets a user pick "which layer to test". A normal run walks the full chain.
+P1 Recovery inside a node: classify missing observation, unreachable target, planning failure, pre-execution simulation failure, placement out of tolerance, and unknown execution status. Input problems return to input or Prompt. Design problems go to Act. Planning problems return to Controller. Service or artifact problems return to the applicable stage. The mechanical agent may not change an optical target or loosen a tolerance. An unreachable target only supplies evidence. The design node handles it.
+P1 Retry meaning: today each target node gets 2 tries and the total is 7. Test rewriting and later mechanical repair share the Act budget. After a test-unit repair plus a polarization-design repair, an execution angle error stopped because the Act budget was exhausted. An improvement must keep the total budget and the original failure record, propose an explicit rule that counts by fault owner or stage, and add a test. Do not retry without a limit, and do not quietly raise the budget.
+P1 Status and acceptance display: distinguish the attempt that is running from the previous failure. Show core items not yet accepted, deferred physical verification, and real failures separately. The optics owner defines which optical metrics are core, implements the layered status and the mechanism, and does not choose physical thresholds alone.
+P2 Control integration: after the interface is stable, connect the control group's existing collision avoidance, trajectory, and pick-and-place implementation. A fixed current bench, a single-component edit, and a neighbor recheck are not a neighbor re-placement. Dry-run before any real machine. The real-machine safety gate is not decided by a language model.
+
+F. Acceptance cases that must be reproducible
+- After a normal full first assembly, the closed loop finishes and the handoff file is byte for byte the same.
+- A single component out of tolerance is the only component with an action. Other poses stay put. The target is not loosened.
+- An unauthorized proposal against a neighbor, a fixed component, a stale world_revision, or old failure evidence is rejected.
+- No response, or a bias that continues, stops at an explicit budget. The error type and the responsible node can be traced.
+- If a crash happens after the result is on disk and before the checkpoint is committed, recovery does not apply the motion twice.
+- A tampered plan, ZIP, or report, a duplicate JSON key, a non-finite number, or a mismatched unit, frame, or calibration is rejected.
+- If an execution request was sent and the result is unknown: query, verify, or hand it to a person. Do not execute again automatically.
+- Model timeout, truncation, and overload are handled by the in-graph policy. A real failure stays distinct from a model stand-in.
+- Before and after rollback, the page can show the failure evidence, the agent decision, the plan diff, the recheck, and the final partial or complete acceptance.
+Existing examples are concentrated in test_algorithm_flow.py and test_agent_algorithm.py. Collision, grasp, HTTP jobs, and real calibration are new acceptance tasks. Do not write them as already passed.
+
+G. Ownership
+The mechanical and AI owner has service adaptation, the recovery protocol, agent tool calls, and fault tests. The optics owner has experiment targets, whether a component choice is reasonable, and optical acceptance conditions. The control group has the low-level motion algorithms and hardware constraints. A change to a formal graph edge or contract needs team confirmation. Deliver code, tests, an interface-change note, and known limits. Do not commit an API key or original run data.

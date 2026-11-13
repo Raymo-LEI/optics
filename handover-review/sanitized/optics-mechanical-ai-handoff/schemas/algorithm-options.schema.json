@@ -1,0 +1,42 @@
+{
+  "additionalProperties": false,
+  "properties": {
+    "position_response": {
+      "default": 0.5,
+      "maximum": 1,
+      "minimum": 0,
+      "title": "Position Response",
+      "type": "number"
+    },
+    "angle_response": {
+      "default": 0.8,
+      "maximum": 1,
+      "minimum": 0,
+      "title": "Angle Response",
+      "type": "number"
+    },
+    "initial_position_error_m": {
+      "default": 0.003,
+      "maximum": 0.01,
+      "minimum": 0,
+      "title": "Initial Position Error M",
+      "type": "number"
+    },
+    "initial_angle_error_rad": {
+      "default": 0.03490658503988659,
+      "maximum": 0.1,
+      "minimum": 0,
+      "title": "Initial Angle Error Rad",
+      "type": "number"
+    },
+    "delay_s": {
+      "default": 0.65,
+      "maximum": 2,
+      "minimum": 0,
+      "title": "Delay S",
+      "type": "number"
+    }
+  },
+  "title": "AlgorithmOptions",
+  "type": "object"
+}

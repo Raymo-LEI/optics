@@ -1,0 +1,43 @@
+Mechanical and AI handoff / 2026-11-13
+
+For the person taking over: run the offline flow in this package first, then read the interfaces, then change code. This English copy does not include an API key. Put your own key in the OPENAI_API_KEY environment variable, or in config/local.json, which is listed in .gitignore. The ZIP is not encrypted. A cloud agent call spends the quota of whichever key you supply. No real robot address is included.
+
+The remote account name was removed. The two reference documents in references/ are the bundled copies of pinned commit 8ff05a0d8ff98328ad3837ac167787bdba669649. Do not treat them as a later revision of that repository.
+
+1. What is included
+- optics-langgraph/: the workbench Python source, web page, contracts, and tests. User-facing text in this copy is English.
+- references/: the core flow and the hardware-deployment draft from that pinned commit.
+- INTERFACES_AND_TASKS.txt: current interfaces, differences from the formal interface, ownership, and the acceptance list.
+- OPTIMIZATION_GOALS.txt: a task description that can be forwarded on its own.
+- manifest.json and CHECKS.txt: source notes, the integrity list, and the verification record.
+Historical runs, the database, camera images, video, a personal knowledge base, old control projects, and virtual environments were not copied. Adapter source for the old physical flow is kept, but robot-arm-control and the MuJoCo/LightPipes environments are not. Those old branches are not a runnable capability of this package.
+
+2. Environment and install
+macOS and Linux, Python 3.12. On Windows use WSL2: the runtime uses fcntl file locks and does not run on native Windows.
+From the optics-langgraph directory in this package:
+  python3.12 -m venv .venv
+  source .venv/bin/activate
+  python -m pip install -r requirements.lock.txt
+  python -m pip install -e . --no-deps
+The lock file is the installed-version snapshot from the handoff. Installation still needs a network connection and platform wheels. It is not guaranteed to run without setup on a system that was not tested.
+
+3. Run the closed loop that does not call an API
+  python handoff_demo.py
+It uses the registered 15-component Michelson fixture and the rule policy, and it only checks the architecture. Expected: an L25 position failure returns to Controller, an angle failure returns to Act, the algorithm runs for 3 rounds, the other 14 components do not move, the same plan bytes are handed off, and the status is algorithm_passed. It is not a demonstration of general optical design, and it does not produce real mechanical motion.
+Then start the web page:
+  python -m optics_graph.cli serve --port 8766
+Open http://127.0.0.1:8766. The offline example appears in the list. If port 8766 is taken, choose another port.
+"Create and run an algorithm test" calls a real cloud model. It is not the offline fixture. The default model is gpt-6.1-sol/high. The application sets no output-token cap; the model service still has its own limits. If the key is not allowed to use that model, the run must fail explicitly. It must not quietly downgrade or fake success with rules. OPENAI_API_KEY overrides the package config. Agents are instructed to write English.
+Example input: Build a 3x Kepler beam expander using 50 mm and 150 mm positive lenses separated by 200 mm.
+
+4. Required offline regression
+  python -m pytest -q tests/test_algorithm_flow.py tests/test_agent_algorithm.py tests/test_optical_tests.py tests/test_gateway_server.py tests/test_presentation.py tests/test_presentation_api.py
+These tests use rule fixtures or a model stand-in and do not call a real cloud model. Other tests cover the old physical flow. A skip caused by a missing external environment must not be reported as a pass.
+
+5. What is done, and what is not
+What can run: requirements agent, design agent, dedicated test generation, programmatic calculation, independent review, incremental algorithm plan, algorithm execution and error, layered rollback, same-plan simulated acceptance, and the web record.
+What must not be claimed: finished real-camera calibration, finished arm reachability or collision avoidance, a connected real-trajectory ROSi, or a passed real optical measurement for an arbitrary experiment.
+algorithm_passed currently means the algorithm workflow finished. It does not mean every experiment requirement was verified. The test engine can count a deferred requirement as covered. That acceptance gap stays an open item. A green label is not proof of the result.
+
+6. How to start, and what to deliver
+Read the core flow in references/, then INTERFACES_AND_TASKS. Use your own development branch or repository. Do not commit private configuration. The first delivery should be the interface and the fault closed loop. Do not start by rewriting all of LangGraph, and do not restore optical-control tuning. When a test fails, keep the original record. Do not edit evidence under data to make it pass.

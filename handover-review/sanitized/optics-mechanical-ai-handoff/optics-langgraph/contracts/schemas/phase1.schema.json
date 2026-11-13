@@ -1,0 +1,1153 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:optics:phase1:1.0",
+  "title": "Phase 1 simulator-independent business contracts",
+  "oneOf": [
+    {
+      "$ref": "#/$defs/layout"
+    },
+    {
+      "$ref": "#/$defs/plan"
+    },
+    {
+      "$ref": "#/$defs/observation"
+    },
+    {
+      "$ref": "#/$defs/result"
+    }
+  ],
+  "$defs": {
+    "pose": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "frame_id": {
+          "const": "optical_table"
+        },
+        "position_m": {
+          "type": "array",
+          "items": {
+            "type": "number"
+          },
+          "minItems": 3,
+          "maxItems": 3
+        },
+        "orientation_xyzw": {
+          "type": "array",
+          "items": {
+            "type": "number"
+          },
+          "minItems": 4,
+          "maxItems": 4
+        }
+      },
+      "required": [
+        "frame_id",
+        "position_m",
+        "orientation_xyzw"
+      ]
+    },
+    "tolerance": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "position_m": {
+          "type": "number",
+          "exclusiveMinimum": 0
+        },
+        "angle_rad": {
+          "type": "number",
+          "exclusiveMinimum": 0
+        }
+      },
+      "required": [
+        "position_m",
+        "angle_rad"
+      ]
+    },
+    "error": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "code": {
+          "type": "string",
+          "minLength": 1
+        },
+        "message": {
+          "type": "string",
+          "minLength": 1
+        },
+        "retryable": {
+          "type": "boolean"
+        },
+        "details": {
+          "type": "object",
+          "additionalProperties": {
+            "type": [
+              "string",
+              "number",
+              "boolean",
+              "null"
+            ]
+          }
+        }
+      },
+      "required": [
+        "code",
+        "message",
+        "retryable",
+        "details"
+      ]
+    },
+    "component": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "object_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "role": {
+          "enum": [
+            "laser",
+            "beam_splitter",
+            "mirror_arm_x",
+            "mirror_arm_y",
+            "detector"
+          ]
+        },
+        "movable": {
+          "type": "boolean"
+        },
+        "marker_id": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 49
+        },
+        "target_pose": {
+          "$ref": "#/$defs/pose"
+        }
+      },
+      "required": [
+        "object_id",
+        "role",
+        "movable",
+        "marker_id",
+        "target_pose"
+      ]
+    },
+    "layout": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "schema_version": {
+          "const": "1.0"
+        },
+        "document_type": {
+          "const": "optical_layout"
+        },
+        "layout_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "scene_revision": {
+          "type": "string",
+          "minLength": 1
+        },
+        "constraint_revision": {
+          "type": "string",
+          "minLength": 1
+        },
+        "experiment": {
+          "const": "michelson_geometric"
+        },
+        "units": {
+          "const": "SI_m_rad_s"
+        },
+        "components": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/component"
+          },
+          "minItems": 5,
+          "maxItems": 5
+        },
+        "tolerance": {
+          "$ref": "#/$defs/tolerance"
+        }
+      },
+      "required": [
+        "schema_version",
+        "document_type",
+        "layout_id",
+        "scene_revision",
+        "constraint_revision",
+        "experiment",
+        "units",
+        "components",
+        "tolerance"
+      ]
+    },
+    "action": {
+      "oneOf": [
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "action_id": {
+              "type": "string",
+              "minLength": 1
+            },
+            "depends_on": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "minLength": 1
+              },
+              "minItems": 0
+            },
+            "primitive": {
+              "const": "initialize"
+            },
+            "args": {
+              "type": "object",
+              "additionalProperties": false,
+              "properties": {},
+              "required": []
+            },
+            "timeout_s": {
+              "type": "number",
+              "exclusiveMinimum": 0
+            }
+          },
+          "required": [
+            "action_id",
+            "depends_on",
+            "primitive",
+            "args",
+            "timeout_s"
+          ]
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "action_id": {
+              "type": "string",
+              "minLength": 1
+            },
+            "depends_on": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "minLength": 1
+              },
+              "minItems": 0
+            },
+            "primitive": {
+              "const": "observe_scene"
+            },
+            "args": {
+              "type": "object",
+              "additionalProperties": false,
+              "properties": {
+                "camera_ids": {
+                  "type": "array",
+                  "items": {
+                    "enum": [
+                      "camera_overhead_a",
+                      "camera_overhead_b",
+                      "camera_wrist"
+                    ]
+                  },
+                  "minItems": 1,
+                  "maxItems": 3
+                },
+                "object_ids": {
+                  "type": "array",
+                  "items": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "minItems": 0
+                }
+              },
+              "required": [
+                "camera_ids",
+                "object_ids"
+              ]
+            },
+            "timeout_s": {
+              "type": "number",
+              "exclusiveMinimum": 0
+            }
+          },
+          "required": [
+            "action_id",
+            "depends_on",
+            "primitive",
+            "args",
+            "timeout_s"
+          ]
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "action_id": {
+              "type": "string",
+              "minLength": 1
+            },
+            "depends_on": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "minLength": 1
+              },
+              "minItems": 0
+            },
+            "primitive": {
+              "const": "pick"
+            },
+            "args": {
+              "type": "object",
+              "additionalProperties": false,
+              "properties": {
+                "object_id": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "observation_ref": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "grasp_profile_id": {
+                  "const": "top_grasp_v1"
+                }
+              },
+              "required": [
+                "object_id",
+                "observation_ref",
+                "grasp_profile_id"
+              ]
+            },
+            "timeout_s": {
+              "type": "number",
+              "exclusiveMinimum": 0
+            }
+          },
+          "required": [
+            "action_id",
+            "depends_on",
+            "primitive",
+            "args",
+            "timeout_s"
+          ]
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "action_id": {
+              "type": "string",
+              "minLength": 1
+            },
+            "depends_on": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "minLength": 1
+              },
+              "minItems": 0
+            },
+            "primitive": {
+              "const": "place"
+            },
+            "args": {
+              "type": "object",
+              "additionalProperties": false,
+              "properties": {
+                "object_id": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "target_pose": {
+                  "$ref": "#/$defs/pose"
+                },
+                "tolerance": {
+                  "$ref": "#/$defs/tolerance"
+                }
+              },
+              "required": [
+                "object_id",
+                "target_pose",
+                "tolerance"
+              ]
+            },
+            "timeout_s": {
+              "type": "number",
+              "exclusiveMinimum": 0
+            }
+          },
+          "required": [
+            "action_id",
+            "depends_on",
+            "primitive",
+            "args",
+            "timeout_s"
+          ]
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "action_id": {
+              "type": "string",
+              "minLength": 1
+            },
+            "depends_on": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "minLength": 1
+              },
+              "minItems": 0
+            },
+            "primitive": {
+              "const": "verify_placement"
+            },
+            "args": {
+              "type": "object",
+              "additionalProperties": false,
+              "properties": {
+                "object_id": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "target_pose": {
+                  "$ref": "#/$defs/pose"
+                },
+                "tolerance": {
+                  "$ref": "#/$defs/tolerance"
+                }
+              },
+              "required": [
+                "object_id",
+                "target_pose",
+                "tolerance"
+              ]
+            },
+            "timeout_s": {
+              "type": "number",
+              "exclusiveMinimum": 0
+            }
+          },
+          "required": [
+            "action_id",
+            "depends_on",
+            "primitive",
+            "args",
+            "timeout_s"
+          ]
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "action_id": {
+              "type": "string",
+              "minLength": 1
+            },
+            "depends_on": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "minLength": 1
+              },
+              "minItems": 0
+            },
+            "primitive": {
+              "const": "home"
+            },
+            "args": {
+              "type": "object",
+              "additionalProperties": false,
+              "properties": {},
+              "required": []
+            },
+            "timeout_s": {
+              "type": "number",
+              "exclusiveMinimum": 0
+            }
+          },
+          "required": [
+            "action_id",
+            "depends_on",
+            "primitive",
+            "args",
+            "timeout_s"
+          ]
+        }
+      ]
+    },
+    "plan": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "schema_version": {
+          "const": "1.0"
+        },
+        "document_type": {
+          "const": "action_plan"
+        },
+        "plan_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "layout_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "layout_sha256": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "validation_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "failure_policy": {
+          "const": "stop"
+        },
+        "actions": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/action"
+          },
+          "minItems": 1,
+          "maxItems": 64
+        }
+      },
+      "required": [
+        "schema_version",
+        "document_type",
+        "plan_id",
+        "layout_id",
+        "layout_sha256",
+        "validation_id",
+        "failure_policy",
+        "actions"
+      ]
+    },
+    "intrinsics": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "width_px": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "height_px": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "fx_px": {
+          "type": "number",
+          "exclusiveMinimum": 0
+        },
+        "fy_px": {
+          "type": "number",
+          "exclusiveMinimum": 0
+        },
+        "cx_px": {
+          "type": "number",
+          "minimum": 0
+        },
+        "cy_px": {
+          "type": "number",
+          "minimum": 0
+        },
+        "distortion_model": {
+          "enum": [
+            "none",
+            "opencv_plumb_bob"
+          ]
+        },
+        "distortion_coeffs": {
+          "type": "array",
+          "items": {
+            "type": "number"
+          },
+          "minItems": 0
+        }
+      },
+      "required": [
+        "width_px",
+        "height_px",
+        "fx_px",
+        "fy_px",
+        "cx_px",
+        "cy_px",
+        "distortion_model",
+        "distortion_coeffs"
+      ]
+    },
+    "rgb": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "uri": {
+          "type": "string",
+          "minLength": 1
+        },
+        "encoding": {
+          "const": "RGB8"
+        },
+        "sha256": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        }
+      },
+      "required": [
+        "uri",
+        "encoding",
+        "sha256"
+      ]
+    },
+    "depth": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "uri": {
+          "type": "string",
+          "minLength": 1
+        },
+        "encoding": {
+          "const": "float32_npy"
+        },
+        "sha256": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "unit": {
+          "const": "m"
+        },
+        "meaning": {
+          "const": "optical_axis_z"
+        },
+        "registered_to_rgb": {
+          "const": true
+        },
+        "invalid_value": {
+          "const": "NaN"
+        },
+        "valid_ratio": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1
+        }
+      },
+      "required": [
+        "uri",
+        "encoding",
+        "sha256",
+        "unit",
+        "meaning",
+        "registered_to_rgb",
+        "invalid_value",
+        "valid_ratio"
+      ]
+    },
+    "camera": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "camera_id": {
+          "enum": [
+            "camera_overhead_a",
+            "camera_overhead_b",
+            "camera_wrist"
+          ]
+        },
+        "frame_id": {
+          "enum": [
+            "camera_overhead_a_optical",
+            "camera_overhead_b_optical",
+            "camera_wrist_rgb_optical"
+          ]
+        },
+        "time_s": {
+          "type": "number",
+          "minimum": 0
+        },
+        "calibration_revision": {
+          "type": "string",
+          "minLength": 1
+        },
+        "intrinsics": {
+          "$ref": "#/$defs/intrinsics"
+        },
+        "rgb": {
+          "$ref": "#/$defs/rgb"
+        },
+        "depth": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/depth"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      },
+      "required": [
+        "camera_id",
+        "frame_id",
+        "time_s",
+        "calibration_revision",
+        "intrinsics",
+        "rgb",
+        "depth"
+      ]
+    },
+    "estimate": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "object_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "marker_id": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 49
+        },
+        "pose": {
+          "$ref": "#/$defs/pose"
+        },
+        "source": {
+          "enum": [
+            "aruco_pnp",
+            "aruco_rgbd"
+          ]
+        },
+        "camera_ids": {
+          "type": "array",
+          "items": {
+            "enum": [
+              "camera_overhead_a",
+              "camera_overhead_b",
+              "camera_wrist"
+            ]
+          },
+          "minItems": 1,
+          "maxItems": 3
+        },
+        "confidence": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1
+        },
+        "reprojection_error_px": {
+          "type": "number",
+          "minimum": 0
+        },
+        "position_std_m": {
+          "type": "array",
+          "items": {
+            "type": "number",
+            "minimum": 0
+          },
+          "minItems": 3,
+          "maxItems": 3
+        },
+        "orientation_std_rad": {
+          "type": "array",
+          "items": {
+            "type": "number",
+            "minimum": 0
+          },
+          "minItems": 3,
+          "maxItems": 3
+        }
+      },
+      "required": [
+        "object_id",
+        "marker_id",
+        "pose",
+        "source",
+        "camera_ids",
+        "confidence",
+        "reprojection_error_px",
+        "position_std_m",
+        "orientation_std_rad"
+      ]
+    },
+    "observation": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "schema_version": {
+          "const": "1.0"
+        },
+        "document_type": {
+          "const": "robot_observation"
+        },
+        "observation_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "run_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "scene_revision": {
+          "type": "string",
+          "minLength": 1
+        },
+        "clock_id": {
+          "const": "run_monotonic"
+        },
+        "time_s": {
+          "type": "number",
+          "minimum": 0
+        },
+        "calibration_revision": {
+          "type": "string",
+          "minLength": 1
+        },
+        "cameras": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/camera"
+          },
+          "minItems": 1,
+          "maxItems": 3
+        },
+        "objects": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/estimate"
+          },
+          "minItems": 0
+        },
+        "missing_object_ids": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "minItems": 0
+        },
+        "robot_state": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "joint_names": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "minLength": 1
+              },
+              "minItems": 7,
+              "maxItems": 7
+            },
+            "joint_positions_rad": {
+              "type": "array",
+              "items": {
+                "type": "number"
+              },
+              "minItems": 7,
+              "maxItems": 7
+            },
+            "joint_time_s": {
+              "type": "number",
+              "minimum": 0
+            },
+            "gripper_width_m": {
+              "type": "number",
+              "minimum": 0
+            },
+            "held_object_id": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "minLength": 1
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "status": {
+              "enum": [
+                "ready",
+                "holding",
+                "fault",
+                "unknown"
+              ]
+            }
+          },
+          "required": [
+            "joint_names",
+            "joint_positions_rad",
+            "joint_time_s",
+            "gripper_width_m",
+            "held_object_id",
+            "status"
+          ]
+        }
+      },
+      "required": [
+        "schema_version",
+        "document_type",
+        "observation_id",
+        "run_id",
+        "scene_revision",
+        "clock_id",
+        "time_s",
+        "calibration_revision",
+        "cameras",
+        "objects",
+        "missing_object_ids",
+        "robot_state"
+      ]
+    },
+    "step_result": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "action_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "operation_id": {
+          "anyOf": [
+            {
+              "type": "string",
+              "minLength": 1
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "status": {
+          "enum": [
+            "succeeded",
+            "failed",
+            "cancelled",
+            "skipped"
+          ]
+        },
+        "started_time_s": {
+          "anyOf": [
+            {
+              "type": "number",
+              "minimum": 0
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "finished_time_s": {
+          "anyOf": [
+            {
+              "type": "number",
+              "minimum": 0
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "observation_ids": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "minItems": 0
+        },
+        "evidence_uris": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "minItems": 0
+        },
+        "error": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/error"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      },
+      "required": [
+        "action_id",
+        "operation_id",
+        "status",
+        "started_time_s",
+        "finished_time_s",
+        "observation_ids",
+        "evidence_uris",
+        "error"
+      ]
+    },
+    "verification": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "object_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "observation_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "position_error_m": {
+          "type": "number",
+          "minimum": 0
+        },
+        "angle_error_rad": {
+          "type": "number",
+          "minimum": 0
+        },
+        "settled_duration_s": {
+          "type": "number",
+          "minimum": 0
+        },
+        "source": {
+          "const": "vision"
+        },
+        "passed": {
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "object_id",
+        "observation_id",
+        "position_error_m",
+        "angle_error_rad",
+        "settled_duration_s",
+        "source",
+        "passed"
+      ]
+    },
+    "result": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "schema_version": {
+          "const": "1.0"
+        },
+        "document_type": {
+          "const": "execution_result"
+        },
+        "run_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "plan_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "layout_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "layout_sha256": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "status": {
+          "enum": [
+            "succeeded",
+            "failed",
+            "cancelled"
+          ]
+        },
+        "clock_id": {
+          "const": "run_monotonic"
+        },
+        "started_time_s": {
+          "type": "number",
+          "minimum": 0
+        },
+        "finished_time_s": {
+          "type": "number",
+          "minimum": 0
+        },
+        "steps": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/step_result"
+          },
+          "minItems": 1,
+          "maxItems": 64
+        },
+        "visual_verifications": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/verification"
+          },
+          "minItems": 0
+        },
+        "runtime_visual_pass": {
+          "type": "boolean"
+        },
+        "held_object_id": {
+          "anyOf": [
+            {
+              "type": "string",
+              "minLength": 1
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "error": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/error"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "offline_evaluation_status": {
+          "const": "not_consumed_by_runtime"
+        }
+      },
+      "required": [
+        "schema_version",
+        "document_type",
+        "run_id",
+        "plan_id",
+        "layout_id",
+        "layout_sha256",
+        "status",
+        "clock_id",
+        "started_time_s",
+        "finished_time_s",
+        "steps",
+        "visual_verifications",
+        "runtime_visual_pass",
+        "held_object_id",
+        "error",
+        "offline_evaluation_status"
+      ]
+    }
+  }
+}

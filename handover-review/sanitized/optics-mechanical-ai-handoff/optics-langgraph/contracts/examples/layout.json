@@ -1,0 +1,115 @@
+{
+  "schema_version": "1.0",
+  "document_type": "optical_layout",
+  "layout_id": "layout-001",
+  "scene_revision": "michelson-scene-v1",
+  "constraint_revision": "michelson-rules-v1",
+  "experiment": "michelson_geometric",
+  "units": "SI_m_rad_s",
+  "components": [
+    {
+      "object_id": "laser_01",
+      "role": "laser",
+      "movable": false,
+      "marker_id": 10,
+      "target_pose": {
+        "frame_id": "optical_table",
+        "position_m": [
+          0.1,
+          0.2,
+          0
+        ],
+        "orientation_xyzw": [
+          0,
+          0,
+          0.0,
+          1.0
+        ]
+      }
+    },
+    {
+      "object_id": "beam_splitter_01",
+      "role": "beam_splitter",
+      "movable": true,
+      "marker_id": 11,
+      "target_pose": {
+        "frame_id": "optical_table",
+        "position_m": [
+          0.3,
+          0.2,
+          0
+        ],
+        "orientation_xyzw": [
+          0,
+          0,
+          -0.3826834323650898,
+          0.9238795325112867
+        ]
+      }
+    },
+    {
+      "object_id": "mirror_x_01",
+      "role": "mirror_arm_x",
+      "movable": true,
+      "marker_id": 12,
+      "target_pose": {
+        "frame_id": "optical_table",
+        "position_m": [
+          0.5,
+          0.2,
+          0
+        ],
+        "orientation_xyzw": [
+          0,
+          0,
+          0.0,
+          1.0
+        ]
+      }
+    },
+    {
+      "object_id": "mirror_y_01",
+      "role": "mirror_arm_y",
+      "movable": true,
+      "marker_id": 13,
+      "target_pose": {
+        "frame_id": "optical_table",
+        "position_m": [
+          0.3,
+          0.4,
+          0
+        ],
+        "orientation_xyzw": [
+          0,
+          0,
+          0.7071067811865475,
+          0.7071067811865476
+        ]
+      }
+    },
+    {
+      "object_id": "detector_01",
+      "role": "detector",
+      "movable": false,
+      "marker_id": 14,
+      "target_pose": {
+        "frame_id": "optical_table",
+        "position_m": [
+          0.3,
+          0.05,
+          0
+        ],
+        "orientation_xyzw": [
+          0,
+          0,
+          0.7071067811865475,
+          0.7071067811865476
+        ]
+      }
+    }
+  ],
+  "tolerance": {
+    "position_m": 0.01,
+    "angle_rad": 0.0523598776
+  }
+}

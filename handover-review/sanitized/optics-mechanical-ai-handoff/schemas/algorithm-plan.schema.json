@@ -1,0 +1,149 @@
+{
+  "$defs": {
+    "Action": {
+      "additionalProperties": false,
+      "properties": {
+        "object_id": {
+          "title": "Object Id",
+          "type": "string"
+        },
+        "operation": {
+          "enum": [
+            "translate",
+            "align",
+            "place"
+          ],
+          "title": "Operation",
+          "type": "string"
+        },
+        "delta_position_m": {
+          "items": {
+            "type": "number"
+          },
+          "maxItems": 3,
+          "minItems": 3,
+          "title": "Delta Position M",
+          "type": "array"
+        },
+        "delta_yaw_rad": {
+          "title": "Delta Yaw Rad",
+          "type": "number"
+        }
+      },
+      "required": [
+        "object_id",
+        "operation",
+        "delta_position_m",
+        "delta_yaw_rad"
+      ],
+      "title": "Action",
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "properties": {
+    "schema_version": {
+      "const": "algorithm-rosi/v1",
+      "title": "Schema Version",
+      "type": "string"
+    },
+    "source": {
+      "const": "algorithm_v1",
+      "title": "Source",
+      "type": "string"
+    },
+    "scene_revision": {
+      "title": "Scene Revision",
+      "type": "string"
+    },
+    "frame_id": {
+      "const": "optical_table",
+      "title": "Frame Id",
+      "type": "string"
+    },
+    "position_unit": {
+      "const": "m",
+      "title": "Position Unit",
+      "type": "string"
+    },
+    "angle_unit": {
+      "const": "rad",
+      "title": "Angle Unit",
+      "type": "string"
+    },
+    "world_revision": {
+      "minimum": 0,
+      "title": "World Revision",
+      "type": "integer"
+    },
+    "current_sha256": {
+      "pattern": "^[0-9a-f]{64}$",
+      "title": "Current Sha256",
+      "type": "string"
+    },
+    "target_sha256": {
+      "pattern": "^[0-9a-f]{64}$",
+      "title": "Target Sha256",
+      "type": "string"
+    },
+    "assumptions_sha256": {
+      "pattern": "^[0-9a-f]{64}$",
+      "title": "Assumptions Sha256",
+      "type": "string"
+    },
+    "experiment_sha256": {
+      "anyOf": [
+        {
+          "pattern": "^[0-9a-f]{64}$",
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Experiment Sha256"
+    },
+    "phase": {
+      "default": "repair",
+      "enum": [
+        "repair",
+        "assembly"
+      ],
+      "title": "Phase",
+      "type": "string"
+    },
+    "allowed_object_ids": {
+      "items": {
+        "type": "string"
+      },
+      "maxItems": 128,
+      "title": "Allowed Object Ids",
+      "type": "array"
+    },
+    "actions": {
+      "items": {
+        "$ref": "#/$defs/Action"
+      },
+      "maxItems": 128,
+      "title": "Actions",
+      "type": "array"
+    }
+  },
+  "required": [
+    "schema_version",
+    "source",
+    "scene_revision",
+    "frame_id",
+    "position_unit",
+    "angle_unit",
+    "world_revision",
+    "current_sha256",
+    "target_sha256",
+    "assumptions_sha256",
+    "allowed_object_ids",
+    "actions"
+  ],
+  "title": "AlgorithmPlan",
+  "type": "object"
+}

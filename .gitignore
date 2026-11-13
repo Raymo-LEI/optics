@@ -8,47 +8,11 @@ tools/visualize_run/.venv/
 # Regenerate with: tools/print-codex-config.sh > .codex/config.toml
 .codex/config.toml
 
-# The received handoff package, its keys, and its run data stay on this machine.
-# Only the files added or edited for skills, MCP, and the panel are re-included below.
-handover-review/**
-!handover-review/sanitized/
-!handover-review/sanitized/optics-mechanical-ai-handoff/
-!handover-review/sanitized/optics-mechanical-ai-handoff/optics-langgraph/
-!handover-review/sanitized/optics-mechanical-ai-handoff/optics-langgraph/optics_graph/
-!handover-review/sanitized/optics-mechanical-ai-handoff/optics-langgraph/optics_graph/decider_guides/
-!handover-review/sanitized/optics-mechanical-ai-handoff/optics-langgraph/optics_graph/vendor/
-!handover-review/sanitized/optics-mechanical-ai-handoff/optics-langgraph/optics_graph/vendor/haloflux/
-!handover-review/sanitized/optics-mechanical-ai-handoff/optics-langgraph/tests/
-
-!handover-review/sanitized/optics-mechanical-ai-handoff/optics-langgraph/.gitignore
-!handover-review/sanitized/optics-mechanical-ai-handoff/optics-langgraph/requirements-mcp.txt
-!handover-review/sanitized/optics-mechanical-ai-handoff/optics-langgraph/optics_graph/agent_algorithm.py
-!handover-review/sanitized/optics-mechanical-ai-handoff/optics-langgraph/optics_graph/agent_decisions.py
-!handover-review/sanitized/optics-mechanical-ai-handoff/optics-langgraph/optics_graph/algorithm_experiment.py
-!handover-review/sanitized/optics-mechanical-ai-handoff/optics-langgraph/optics_graph/algorithm_sim.py
-!handover-review/sanitized/optics-mechanical-ai-handoff/optics-langgraph/optics_graph/cli_decider.py
-!handover-review/sanitized/optics-mechanical-ai-handoff/optics-langgraph/optics_graph/design_agent.py
-!handover-review/sanitized/optics-mechanical-ai-handoff/optics-langgraph/optics_graph/journal_check.py
-!handover-review/sanitized/optics-mechanical-ai-handoff/optics-langgraph/optics_graph/mcp_evidence.py
-!handover-review/sanitized/optics-mechanical-ai-handoff/optics-langgraph/optics_graph/mcp_runs.py
-!handover-review/sanitized/optics-mechanical-ai-handoff/optics-langgraph/optics_graph/panel.html
-!handover-review/sanitized/optics-mechanical-ai-handoff/optics-langgraph/optics_graph/runtime.py
-!handover-review/sanitized/optics-mechanical-ai-handoff/optics-langgraph/optics_graph/server.py
-!handover-review/sanitized/optics-mechanical-ai-handoff/optics-langgraph/optics_graph/team_flow.py
-!handover-review/sanitized/optics-mechanical-ai-handoff/optics-langgraph/optics_graph/decider_guides/*.md
-!handover-review/sanitized/optics-mechanical-ai-handoff/optics-langgraph/optics_graph/vendor/haloflux/*
-!handover-review/sanitized/optics-mechanical-ai-handoff/optics-langgraph/tests/agent_canned.py
-!handover-review/sanitized/optics-mechanical-ai-handoff/optics-langgraph/tests/test_agent_algorithm.py
-!handover-review/sanitized/optics-mechanical-ai-handoff/optics-langgraph/tests/test_agent_decisions_mcp.py
-!handover-review/sanitized/optics-mechanical-ai-handoff/optics-langgraph/tests/test_agent_mode_parity.py
-!handover-review/sanitized/optics-mechanical-ai-handoff/optics-langgraph/tests/test_agent_review_fixes.py
-!handover-review/sanitized/optics-mechanical-ai-handoff/optics-langgraph/tests/test_cli_decider.py
-!handover-review/sanitized/optics-mechanical-ai-handoff/optics-langgraph/tests/test_control_during_pending_continue.py
-!handover-review/sanitized/optics-mechanical-ai-handoff/optics-langgraph/tests/test_gateway_server.py
-!handover-review/sanitized/optics-mechanical-ai-handoff/optics-langgraph/tests/test_haloflux_overlay.py
-!handover-review/sanitized/optics-mechanical-ai-handoff/optics-langgraph/tests/test_mcp_server_mount.py
-!handover-review/sanitized/optics-mechanical-ai-handoff/optics-langgraph/tests/test_mcp_wrap.py
-!handover-review/sanitized/optics-mechanical-ai-handoff/optics-langgraph/tests/test_skills_conformance.py
+# The received handoff package: its source, contracts, docs and tests are tracked so a
+# clone is runnable. The original ZIP and the unrelated mechanical supplement stay local.
+# Keys and run records are excluded by the rules at the bottom.
+handover-review/*.zip
+handover-review/supplement/
 
 # Caches, environments, keys, and run records, including any path re-included above.
 **/.venv/
@@ -58,3 +22,6 @@ handover-review/**
 **/config/local.json
 **/data/
 **/data-mcp/
+**/*.egg-info/
+**/.pytest_cache/
+.DS_Store

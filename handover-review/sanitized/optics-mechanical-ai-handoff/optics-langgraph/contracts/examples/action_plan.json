@@ -1,0 +1,291 @@
+{
+  "schema_version": "1.0",
+  "document_type": "action_plan",
+  "plan_id": "plan-001",
+  "layout_id": "layout-001",
+  "layout_sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+  "validation_id": "validation-001",
+  "failure_policy": "stop",
+  "actions": [
+    {
+      "action_id": "a01",
+      "depends_on": [],
+      "primitive": "initialize",
+      "args": {},
+      "timeout_s": 10
+    },
+    {
+      "action_id": "a02",
+      "depends_on": [
+        "a01"
+      ],
+      "primitive": "observe_scene",
+      "args": {
+        "camera_ids": [
+          "camera_overhead_a",
+          "camera_overhead_b"
+        ],
+        "object_ids": [
+          "beam_splitter_01"
+        ]
+      },
+      "timeout_s": 10
+    },
+    {
+      "action_id": "a03",
+      "depends_on": [
+        "a02"
+      ],
+      "primitive": "pick",
+      "args": {
+        "object_id": "beam_splitter_01",
+        "observation_ref": "a02",
+        "grasp_profile_id": "top_grasp_v1"
+      },
+      "timeout_s": 60
+    },
+    {
+      "action_id": "a04",
+      "depends_on": [
+        "a03"
+      ],
+      "primitive": "place",
+      "args": {
+        "object_id": "beam_splitter_01",
+        "target_pose": {
+          "frame_id": "optical_table",
+          "position_m": [
+            0.3,
+            0.2,
+            0
+          ],
+          "orientation_xyzw": [
+            0,
+            0,
+            -0.3826834323650898,
+            0.9238795325112867
+          ]
+        },
+        "tolerance": {
+          "position_m": 0.01,
+          "angle_rad": 0.0523598776
+        }
+      },
+      "timeout_s": 60
+    },
+    {
+      "action_id": "a05",
+      "depends_on": [
+        "a04"
+      ],
+      "primitive": "verify_placement",
+      "args": {
+        "object_id": "beam_splitter_01",
+        "target_pose": {
+          "frame_id": "optical_table",
+          "position_m": [
+            0.3,
+            0.2,
+            0
+          ],
+          "orientation_xyzw": [
+            0,
+            0,
+            -0.3826834323650898,
+            0.9238795325112867
+          ]
+        },
+        "tolerance": {
+          "position_m": 0.01,
+          "angle_rad": 0.0523598776
+        }
+      },
+      "timeout_s": 15
+    },
+    {
+      "action_id": "a06",
+      "depends_on": [
+        "a05"
+      ],
+      "primitive": "observe_scene",
+      "args": {
+        "camera_ids": [
+          "camera_overhead_a",
+          "camera_overhead_b"
+        ],
+        "object_ids": [
+          "mirror_x_01"
+        ]
+      },
+      "timeout_s": 10
+    },
+    {
+      "action_id": "a07",
+      "depends_on": [
+        "a06"
+      ],
+      "primitive": "pick",
+      "args": {
+        "object_id": "mirror_x_01",
+        "observation_ref": "a06",
+        "grasp_profile_id": "top_grasp_v1"
+      },
+      "timeout_s": 60
+    },
+    {
+      "action_id": "a08",
+      "depends_on": [
+        "a07"
+      ],
+      "primitive": "place",
+      "args": {
+        "object_id": "mirror_x_01",
+        "target_pose": {
+          "frame_id": "optical_table",
+          "position_m": [
+            0.5,
+            0.2,
+            0
+          ],
+          "orientation_xyzw": [
+            0,
+            0,
+            0.0,
+            1.0
+          ]
+        },
+        "tolerance": {
+          "position_m": 0.01,
+          "angle_rad": 0.0523598776
+        }
+      },
+      "timeout_s": 60
+    },
+    {
+      "action_id": "a09",
+      "depends_on": [
+        "a08"
+      ],
+      "primitive": "verify_placement",
+      "args": {
+        "object_id": "mirror_x_01",
+        "target_pose": {
+          "frame_id": "optical_table",
+          "position_m": [
+            0.5,
+            0.2,
+            0
+          ],
+          "orientation_xyzw": [
+            0,
+            0,
+            0.0,
+            1.0
+          ]
+        },
+        "tolerance": {
+          "position_m": 0.01,
+          "angle_rad": 0.0523598776
+        }
+      },
+      "timeout_s": 15
+    },
+    {
+      "action_id": "a10",
+      "depends_on": [
+        "a09"
+      ],
+      "primitive": "observe_scene",
+      "args": {
+        "camera_ids": [
+          "camera_overhead_a",
+          "camera_overhead_b"
+        ],
+        "object_ids": [
+          "mirror_y_01"
+        ]
+      },
+      "timeout_s": 10
+    },
+    {
+      "action_id": "a11",
+      "depends_on": [
+        "a10"
+      ],
+      "primitive": "pick",
+      "args": {
+        "object_id": "mirror_y_01",
+        "observation_ref": "a10",
+        "grasp_profile_id": "top_grasp_v1"
+      },
+      "timeout_s": 60
+    },
+    {
+      "action_id": "a12",
+      "depends_on": [
+        "a11"
+      ],
+      "primitive": "place",
+      "args": {
+        "object_id": "mirror_y_01",
+        "target_pose": {
+          "frame_id": "optical_table",
+          "position_m": [
+            0.3,
+            0.4,
+            0
+          ],
+          "orientation_xyzw": [
+            0,
+            0,
+            0.7071067811865475,
+            0.7071067811865476
+          ]
+        },
+        "tolerance": {
+          "position_m": 0.01,
+          "angle_rad": 0.0523598776
+        }
+      },
+      "timeout_s": 60
+    },
+    {
+      "action_id": "a13",
+      "depends_on": [
+        "a12"
+      ],
+      "primitive": "verify_placement",
+      "args": {
+        "object_id": "mirror_y_01",
+        "target_pose": {
+          "frame_id": "optical_table",
+          "position_m": [
+            0.3,
+            0.4,
+            0
+          ],
+          "orientation_xyzw": [
+            0,
+            0,
+            0.7071067811865475,
+            0.7071067811865476
+          ]
+        },
+        "tolerance": {
+          "position_m": 0.01,
+          "angle_rad": 0.0523598776
+        }
+      },
+      "timeout_s": 15
+    },
+    {
+      "action_id": "a14",
+      "depends_on": [
+        "a13"
+      ],
+      "primitive": "home",
+      "args": {},
+      "timeout_s": 60
+    }
+  ]
+}

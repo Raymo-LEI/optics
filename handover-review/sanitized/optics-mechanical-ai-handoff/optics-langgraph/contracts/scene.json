@@ -1,0 +1,147 @@
+{
+  "scene_revision": "michelson-scene-v1",
+  "constraint_revision": "michelson-rules-v1",
+  "calibration_status": "example_only_unmeasured",
+  "frame_id": "optical_table",
+  "support_height_m": 0.0,
+  "workspace_polygon_m": [
+    [
+      0,
+      0
+    ],
+    [
+      0.6,
+      0
+    ],
+    [
+      0.6,
+      0.5
+    ],
+    [
+      0,
+      0.5
+    ]
+  ],
+  "illustrative_reach_polygon_m": [
+    [
+      0,
+      0
+    ],
+    [
+      0.6,
+      0
+    ],
+    [
+      0.6,
+      0.5
+    ],
+    [
+      0,
+      0.5
+    ]
+  ],
+  "minimum_clearance_m": 0.01,
+  "optical_axis_height_m": 0.05,
+  "request_tolerance": {
+    "position_m": 0.01,
+    "angle_rad": 0.0523598776
+  },
+  "placement_tolerance_limit": {
+    "position_m": 0.01,
+    "angle_rad": 0.0523598776
+  },
+  "objects": {
+    "laser_01": {
+      "role": "laser",
+      "movable": false,
+      "marker_id": 10,
+      "footprint_m": [
+        0.04,
+        0.04
+      ],
+      "height_m": 0.06,
+      "optical_center_height_m": 0.05,
+      "aperture_radius_m": 0.005,
+      "fixed_pose": {
+        "frame_id": "optical_table",
+        "position_m": [
+          0.1,
+          0.2,
+          0
+        ],
+        "orientation_xyzw": [
+          0,
+          0,
+          0.0,
+          1.0
+        ]
+      }
+    },
+    "beam_splitter_01": {
+      "role": "beam_splitter",
+      "movable": true,
+      "marker_id": 11,
+      "footprint_m": [
+        0.04,
+        0.04
+      ],
+      "height_m": 0.06,
+      "optical_center_height_m": 0.05,
+      "aperture_radius_m": 0.005,
+      "grasp_profile_id": "top_grasp_v1"
+    },
+    "mirror_x_01": {
+      "role": "mirror_arm_x",
+      "movable": true,
+      "marker_id": 12,
+      "footprint_m": [
+        0.04,
+        0.04
+      ],
+      "height_m": 0.06,
+      "optical_center_height_m": 0.05,
+      "aperture_radius_m": 0.005,
+      "grasp_profile_id": "top_grasp_v1"
+    },
+    "mirror_y_01": {
+      "role": "mirror_arm_y",
+      "movable": true,
+      "marker_id": 13,
+      "footprint_m": [
+        0.04,
+        0.04
+      ],
+      "height_m": 0.06,
+      "optical_center_height_m": 0.05,
+      "aperture_radius_m": 0.005,
+      "grasp_profile_id": "top_grasp_v1"
+    },
+    "detector_01": {
+      "role": "detector",
+      "movable": false,
+      "marker_id": 14,
+      "footprint_m": [
+        0.04,
+        0.04
+      ],
+      "height_m": 0.06,
+      "optical_center_height_m": 0.05,
+      "aperture_radius_m": 0.005,
+      "fixed_pose": {
+        "frame_id": "optical_table",
+        "position_m": [
+          0.3,
+          0.05,
+          0
+        ],
+        "orientation_xyzw": [
+          0,
+          0,
+          0.7071067811865475,
+          0.7071067811865476
+        ]
+      }
+    }
+  },
+  "obstacles": []
+}

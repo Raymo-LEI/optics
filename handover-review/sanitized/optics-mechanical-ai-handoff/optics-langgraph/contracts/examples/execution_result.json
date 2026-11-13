@@ -1,0 +1,229 @@
+{
+  "schema_version": "1.0",
+  "document_type": "execution_result",
+  "run_id": "run-001",
+  "plan_id": "plan-001",
+  "layout_id": "layout-001",
+  "layout_sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+  "status": "succeeded",
+  "clock_id": "run_monotonic",
+  "started_time_s": 0,
+  "finished_time_s": 42,
+  "steps": [
+    {
+      "action_id": "a01",
+      "operation_id": "op-001",
+      "status": "succeeded",
+      "started_time_s": 0.0,
+      "finished_time_s": 3.0,
+      "observation_ids": [],
+      "evidence_uris": [
+        "artifact://run-001/a01-evidence.json"
+      ],
+      "error": null
+    },
+    {
+      "action_id": "a02",
+      "operation_id": "op-002",
+      "status": "succeeded",
+      "started_time_s": 3.0,
+      "finished_time_s": 6.0,
+      "observation_ids": [
+        "obs-a02"
+      ],
+      "evidence_uris": [
+        "artifact://run-001/a02-evidence.json"
+      ],
+      "error": null
+    },
+    {
+      "action_id": "a03",
+      "operation_id": "op-003",
+      "status": "succeeded",
+      "started_time_s": 6.0,
+      "finished_time_s": 9.0,
+      "observation_ids": [
+        "obs-wrist-001"
+      ],
+      "evidence_uris": [
+        "artifact://run-001/a03-evidence.json"
+      ],
+      "error": null
+    },
+    {
+      "action_id": "a04",
+      "operation_id": "op-004",
+      "status": "succeeded",
+      "started_time_s": 9.0,
+      "finished_time_s": 12.0,
+      "observation_ids": [],
+      "evidence_uris": [
+        "artifact://run-001/a04-evidence.json"
+      ],
+      "error": null
+    },
+    {
+      "action_id": "a05",
+      "operation_id": "op-005",
+      "status": "succeeded",
+      "started_time_s": 12.0,
+      "finished_time_s": 15.0,
+      "observation_ids": [
+        "obs-verify-beam_splitter_01"
+      ],
+      "evidence_uris": [
+        "artifact://run-001/a05-evidence.json"
+      ],
+      "error": null
+    },
+    {
+      "action_id": "a06",
+      "operation_id": "op-006",
+      "status": "succeeded",
+      "started_time_s": 15.0,
+      "finished_time_s": 18.0,
+      "observation_ids": [
+        "obs-a06"
+      ],
+      "evidence_uris": [
+        "artifact://run-001/a06-evidence.json"
+      ],
+      "error": null
+    },
+    {
+      "action_id": "a07",
+      "operation_id": "op-007",
+      "status": "succeeded",
+      "started_time_s": 18.0,
+      "finished_time_s": 21.0,
+      "observation_ids": [],
+      "evidence_uris": [
+        "artifact://run-001/a07-evidence.json"
+      ],
+      "error": null
+    },
+    {
+      "action_id": "a08",
+      "operation_id": "op-008",
+      "status": "succeeded",
+      "started_time_s": 21.0,
+      "finished_time_s": 24.0,
+      "observation_ids": [],
+      "evidence_uris": [
+        "artifact://run-001/a08-evidence.json"
+      ],
+      "error": null
+    },
+    {
+      "action_id": "a09",
+      "operation_id": "op-009",
+      "status": "succeeded",
+      "started_time_s": 24.0,
+      "finished_time_s": 27.0,
+      "observation_ids": [
+        "obs-verify-mirror_x_01"
+      ],
+      "evidence_uris": [
+        "artifact://run-001/a09-evidence.json"
+      ],
+      "error": null
+    },
+    {
+      "action_id": "a10",
+      "operation_id": "op-010",
+      "status": "succeeded",
+      "started_time_s": 27.0,
+      "finished_time_s": 30.0,
+      "observation_ids": [
+        "obs-a10"
+      ],
+      "evidence_uris": [
+        "artifact://run-001/a10-evidence.json"
+      ],
+      "error": null
+    },
+    {
+      "action_id": "a11",
+      "operation_id": "op-011",
+      "status": "succeeded",
+      "started_time_s": 30.0,
+      "finished_time_s": 33.0,
+      "observation_ids": [],
+      "evidence_uris": [
+        "artifact://run-001/a11-evidence.json"
+      ],
+      "error": null
+    },
+    {
+      "action_id": "a12",
+      "operation_id": "op-012",
+      "status": "succeeded",
+      "started_time_s": 33.0,
+      "finished_time_s": 36.0,
+      "observation_ids": [],
+      "evidence_uris": [
+        "artifact://run-001/a12-evidence.json"
+      ],
+      "error": null
+    },
+    {
+      "action_id": "a13",
+      "operation_id": "op-013",
+      "status": "succeeded",
+      "started_time_s": 36.0,
+      "finished_time_s": 39.0,
+      "observation_ids": [
+        "obs-verify-mirror_y_01"
+      ],
+      "evidence_uris": [
+        "artifact://run-001/a13-evidence.json"
+      ],
+      "error": null
+    },
+    {
+      "action_id": "a14",
+      "operation_id": "op-014",
+      "status": "succeeded",
+      "started_time_s": 39.0,
+      "finished_time_s": 42.0,
+      "observation_ids": [],
+      "evidence_uris": [
+        "artifact://run-001/a14-evidence.json"
+      ],
+      "error": null
+    }
+  ],
+  "visual_verifications": [
+    {
+      "object_id": "beam_splitter_01",
+      "observation_id": "obs-verify-beam_splitter_01",
+      "position_error_m": 0.004,
+      "angle_error_rad": 0.02,
+      "settled_duration_s": 0.5,
+      "source": "vision",
+      "passed": true
+    },
+    {
+      "object_id": "mirror_x_01",
+      "observation_id": "obs-verify-mirror_x_01",
+      "position_error_m": 0.004,
+      "angle_error_rad": 0.02,
+      "settled_duration_s": 0.5,
+      "source": "vision",
+      "passed": true
+    },
+    {
+      "object_id": "mirror_y_01",
+      "observation_id": "obs-verify-mirror_y_01",
+      "position_error_m": 0.004,
+      "angle_error_rad": 0.02,
+      "settled_duration_s": 0.5,
+      "source": "vision",
+      "passed": true
+    }
+  ],
+  "runtime_visual_pass": true,
+  "held_object_id": null,
+  "error": null,
+  "offline_evaluation_status": "not_consumed_by_runtime"
+}

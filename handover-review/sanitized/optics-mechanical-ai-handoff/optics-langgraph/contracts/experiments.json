@@ -1,0 +1,333 @@
+{
+  "michelson_full": {
+    "title": "Complete Michelson interferometer",
+    "aliases": [
+      "Michelson"
+    ],
+    "source": "Private_Project_Materials/Research/Closed_Model_Full_Experiment_20261027/answer_first.json",
+    "source_sha256": "2b7927de10dcf884fcee7c2bf6732fbb2a9ea494cf66cd893dcf8f4a8220041c",
+    "parts": [
+      {
+        "id": "LASER",
+        "position_m": [
+          0.1,
+          0.45,
+          0.0
+        ],
+        "yaw_rad": 0.0,
+        "size_m": [
+          0.045,
+          0.045,
+          0.08
+        ]
+      },
+      {
+        "id": "ISO",
+        "position_m": [
+          0.15,
+          0.45,
+          0.0
+        ],
+        "yaw_rad": 0.0,
+        "size_m": [
+          0.045,
+          0.045,
+          0.08
+        ]
+      },
+      {
+        "id": "SH0",
+        "position_m": [
+          0.2,
+          0.45,
+          0.0
+        ],
+        "yaw_rad": 0.0,
+        "size_m": [
+          0.045,
+          0.045,
+          0.08
+        ]
+      },
+      {
+        "id": "L25",
+        "position_m": [
+          0.25,
+          0.45,
+          0.0
+        ],
+        "yaw_rad": 0.0,
+        "size_m": [
+          0.045,
+          0.045,
+          0.08
+        ]
+      },
+      {
+        "id": "L50",
+        "position_m": [
+          0.325,
+          0.45,
+          0.0
+        ],
+        "yaw_rad": 0.0,
+        "size_m": [
+          0.045,
+          0.045,
+          0.08
+        ]
+      },
+      {
+        "id": "BS50",
+        "position_m": [
+          0.5,
+          0.45,
+          0.0
+        ],
+        "yaw_rad": 2.356194490192345,
+        "size_m": [
+          0.045,
+          0.045,
+          0.08
+        ]
+      },
+      {
+        "id": "S_REF",
+        "position_m": [
+          0.6,
+          0.45,
+          0.0
+        ],
+        "yaw_rad": 0.0,
+        "size_m": [
+          0.045,
+          0.045,
+          0.08
+        ]
+      },
+      {
+        "id": "M_FIXED",
+        "position_m": [
+          0.7,
+          0.45,
+          0.0
+        ],
+        "yaw_rad": 0.0,
+        "size_m": [
+          0.045,
+          0.045,
+          0.08
+        ]
+      },
+      {
+        "id": "S_MEAS",
+        "position_m": [
+          0.5,
+          0.55,
+          0.0
+        ],
+        "yaw_rad": 1.5707963267948966,
+        "size_m": [
+          0.045,
+          0.045,
+          0.08
+        ]
+      },
+      {
+        "id": "M_PZT",
+        "position_m": [
+          0.5,
+          0.65,
+          0.0
+        ],
+        "yaw_rad": 1.5707963267948966,
+        "size_m": [
+          0.045,
+          0.045,
+          0.08
+        ]
+      },
+      {
+        "id": "BS10",
+        "position_m": [
+          0.5,
+          0.3,
+          0.0
+        ],
+        "yaw_rad": 0.7853981633974483,
+        "size_m": [
+          0.045,
+          0.045,
+          0.08
+        ]
+      },
+      {
+        "id": "ND2",
+        "position_m": [
+          0.5,
+          0.2,
+          0.0
+        ],
+        "yaw_rad": -1.5707963267948966,
+        "size_m": [
+          0.045,
+          0.045,
+          0.08
+        ]
+      },
+      {
+        "id": "CAM",
+        "position_m": [
+          0.5,
+          0.1,
+          0.0
+        ],
+        "yaw_rad": -1.5707963267948966,
+        "size_m": [
+          0.045,
+          0.045,
+          0.08
+        ]
+      },
+      {
+        "id": "ND1",
+        "position_m": [
+          0.625,
+          0.3,
+          0.0
+        ],
+        "yaw_rad": 0.0,
+        "size_m": [
+          0.045,
+          0.045,
+          0.08
+        ]
+      },
+      {
+        "id": "PD",
+        "position_m": [
+          0.75,
+          0.3,
+          0.0
+        ],
+        "yaw_rad": 0.0,
+        "size_m": [
+          0.045,
+          0.045,
+          0.08
+        ]
+      }
+    ]
+  },
+  "mach_zehnder": {
+    "title": "Mach-Zehnder interferometer",
+    "aliases": [
+      "Mach–Zehnder",
+      "Mach-Zehnder",
+      "Mach Zehnder",
+      "MZI"
+    ],
+    "source": "Private_Project_Materials/Research/MZI_Autonomous/01_Optical_Layouts/layout.json",
+    "source_sha256": "986ae8ad95e3f0c68ceff01c64157c41ac368730428cea6d57fe50e05eb0f003",
+    "parts": [
+      {
+        "id": "S",
+        "position_m": [
+          0.1,
+          0.28,
+          0.0
+        ],
+        "yaw_rad": 0.0,
+        "size_m": [
+          0.045,
+          0.045,
+          0.08
+        ]
+      },
+      {
+        "id": "BS1",
+        "position_m": [
+          0.27,
+          0.28,
+          0.0
+        ],
+        "yaw_rad": -0.7853981633974483,
+        "size_m": [
+          0.045,
+          0.045,
+          0.08
+        ]
+      },
+      {
+        "id": "M1",
+        "position_m": [
+          0.43,
+          0.28,
+          0.0
+        ],
+        "yaw_rad": -0.7853981633974483,
+        "size_m": [
+          0.045,
+          0.045,
+          0.08
+        ]
+      },
+      {
+        "id": "M2",
+        "position_m": [
+          0.27,
+          0.44,
+          0.0
+        ],
+        "yaw_rad": -0.7853981633974483,
+        "size_m": [
+          0.045,
+          0.045,
+          0.08
+        ]
+      },
+      {
+        "id": "BS2",
+        "position_m": [
+          0.43,
+          0.44,
+          0.0
+        ],
+        "yaw_rad": -0.7853981633974483,
+        "size_m": [
+          0.045,
+          0.045,
+          0.08
+        ]
+      },
+      {
+        "id": "D_X",
+        "position_m": [
+          0.6,
+          0.44,
+          0.0
+        ],
+        "yaw_rad": 3.141592653589793,
+        "size_m": [
+          0.045,
+          0.045,
+          0.08
+        ]
+      },
+      {
+        "id": "D_Y",
+        "position_m": [
+          0.43,
+          0.6,
+          0.0
+        ],
+        "yaw_rad": -1.5707963267948966,
+        "size_m": [
+          0.045,
+          0.045,
+          0.08
+        ]
+      }
+    ]
+  }
+}

@@ -1,0 +1,37 @@
+{
+  "additionalProperties": false,
+  "properties": {
+    "operation": {
+      "enum": [
+        "translate",
+        "align",
+        "verify",
+        "stop"
+      ],
+      "title": "Operation",
+      "type": "string"
+    },
+    "object_id": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "title": "Object Id"
+    },
+    "reason": {
+      "title": "Reason",
+      "type": "string"
+    }
+  },
+  "required": [
+    "operation",
+    "object_id",
+    "reason"
+  ],
+  "title": "Repair",
+  "type": "object"
+}

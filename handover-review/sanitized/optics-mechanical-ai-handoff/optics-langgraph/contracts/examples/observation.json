@@ -1,0 +1,104 @@
+{
+  "schema_version": "1.0",
+  "document_type": "robot_observation",
+  "observation_id": "obs-wrist-001",
+  "run_id": "run-001",
+  "scene_revision": "michelson-scene-v1",
+  "clock_id": "run_monotonic",
+  "time_s": 7.0,
+  "calibration_revision": "calib-mj-v1",
+  "cameras": [
+    {
+      "camera_id": "camera_wrist",
+      "frame_id": "camera_wrist_rgb_optical",
+      "time_s": 7.0,
+      "calibration_revision": "calib-mj-v1",
+      "intrinsics": {
+        "width_px": 640,
+        "height_px": 480,
+        "fx_px": 600,
+        "fy_px": 600,
+        "cx_px": 319.5,
+        "cy_px": 239.5,
+        "distortion_model": "none",
+        "distortion_coeffs": []
+      },
+      "rgb": {
+        "uri": "artifact://run-001/wrist-001.png",
+        "encoding": "RGB8",
+        "sha256": "0000000000000000000000000000000000000000000000000000000000000000"
+      },
+      "depth": {
+        "uri": "artifact://run-001/wrist-001-depth.npy",
+        "encoding": "float32_npy",
+        "sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+        "unit": "m",
+        "meaning": "optical_axis_z",
+        "registered_to_rgb": true,
+        "invalid_value": "NaN",
+        "valid_ratio": 0.95
+      }
+    }
+  ],
+  "objects": [
+    {
+      "object_id": "beam_splitter_01",
+      "marker_id": 11,
+      "pose": {
+        "frame_id": "optical_table",
+        "position_m": [
+          0.12,
+          0.32,
+          0
+        ],
+        "orientation_xyzw": [
+          0,
+          0,
+          0.0,
+          1.0
+        ]
+      },
+      "source": "aruco_rgbd",
+      "camera_ids": [
+        "camera_wrist"
+      ],
+      "confidence": 0.95,
+      "reprojection_error_px": 0.6,
+      "position_std_m": [
+        0.002,
+        0.002,
+        0.003
+      ],
+      "orientation_std_rad": [
+        0.01,
+        0.01,
+        0.02
+      ]
+    }
+  ],
+  "missing_object_ids": [],
+  "robot_state": {
+    "joint_names": [
+      "joint1",
+      "joint2",
+      "joint3",
+      "joint4",
+      "joint5",
+      "joint6",
+      "joint7"
+    ],
+    "joint_positions_rad": [
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0
+    ],
+    "joint_time_s": 7.0,
+    "gripper_width_m": 0.06,
+    "held_object_id": null,
+    "status": "ready"
+  }
+}

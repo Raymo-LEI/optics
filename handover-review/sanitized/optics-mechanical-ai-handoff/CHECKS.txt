@@ -1,0 +1,17 @@
+Handoff verification record / 2026-11-13
+
+The source snapshot was run from an independent temporary directory. The import path was confirmed to point at that snapshot, not at the original project:
+- Python 3.12 on macOS, reusing dependencies already installed on that machine. A clean networked install on an unfamiliar machine was not done. Native Windows was not verified.
+- The six test files listed in START_HERE: 109 passed in 14.44s, with no skips.
+- handoff_demo.py: algorithm_passed, 3 rounds, only L25 corrected, the other 14 components unchanged, the final plan bytes identical, motions_sent=0, physical_verified=false.
+- Those tests and the demo made no real model API call. They do not prove that the next person's network, model permission, or real physical service works.
+- At pack time, production source, contracts, and tests were checked byte for byte against the local snapshot. The package added the demo and the notes without changing production logic.
+- The two team documents were read from pinned commit 8ff05a0d8ff98328ad3837ac167787bdba669649. SHA-256 values are in manifest.json. The remote account name is not included in this English copy.
+- This English copy does not contain an API key. It does not include run logs or a historical database. The robot address is empty.
+- ZIP CRC and each member SHA-256 are checked after the archive is built. manifest.json does not include its own hash. Every other file in the package is listed.
+
+This English copy is a translation of that handoff. User-facing text was translated, the remote account name was removed, and the API key was removed. It is not a byte-identical copy of the production snapshot, so the pass count above is the record of the source snapshot.
+
+The English copy was checked again on Python 3.12.15. The six test files named in START_HERE, plus tests/test_registered_experiments.py, passed: 114 passed. That run uses the lockfile dependencies and does not call a model API.
+
+Known issues are in INTERFACES_AND_TASKS. The acceptance scope of the whole package is the mechanical and AI architecture handoff, not hardware acceptance and not acceptance of every optical experiment.
