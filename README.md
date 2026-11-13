@@ -2,7 +2,7 @@
 
 A local optics LangGraph workbench (the received handoff package) plus an agent layer on top of it: skills, MCP servers, web panel changes, and a kinematic run visualizer. Everything here is a simulation. No camera, robot, or optical measurement is connected, and `physical_verified` is false.
 
-This repository is runnable from a clone. API keys, `config/local.json`, virtual environments, run records (`data/`, `data-mcp/`, `demo-output/`) and the original handoff ZIP stay on the machine that produced them. The repository is private; do not make it public without checking the licence notes under Third-party pieces.
+This repository is runnable from a clone. API keys, `config/local.json`, virtual environments, run records (`data/`, `data-mcp/`, `demo-output/`) and the original handoff ZIP stay on the machine that produced them. See License below before using it outside noncommercial work.
 
 ## Quick start
 
@@ -53,3 +53,7 @@ Set `OPTICS_PROJ` to the workbench directory if it is not in the default locatio
 - `tools/visualize_run/assets/ufactory_xarm7/` is the UFACTORY xArm7 model. Its license is in that folder.
 
 The wallpaper's own control labels are the upstream text. Workbench-facing prose in this repository is English.
+
+## License
+
+PolyForm Noncommercial License 1.0.0, see `LICENSE`. Noncommercial use only: personal, research, teaching and noncommercial organizations. Use inside a company or for paid or client work is not permitted. Bundled third-party pieces keep their own licenses, listed in `THIRD_PARTY_NOTICES.md`.
