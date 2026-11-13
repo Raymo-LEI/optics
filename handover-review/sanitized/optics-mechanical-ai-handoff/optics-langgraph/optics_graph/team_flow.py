@@ -40,6 +40,7 @@ RETURNS = {"input":{"input"}, "vision":{"input"}, "prompt":{"prompt"}, "act":{"a
            "controller":{"prompt","act","controller"}, "sim":{"prompt","act","controller","sim"},
            "output":{"prompt","act","controller","sim"}, "precision_output":set(AGENT_NODES)}
 RETRY_LIMIT = 2
+ALGORITHM_PLACEMENT_CODES = ("ALGORITHM_POSITION_MISMATCH", "ALGORITHM_OPTICAL_MISMATCH")
 TOTAL_RETRIES = 7
 DOWNSTREAM = {
     "input": ("prob", "scene", "intent", "layout", "validation", "plan_path", "plan_sha256", "artifact_path"),
@@ -1412,7 +1413,13 @@ def build_team_graph(data_dir, checkpointer=None, gateway_factory=ModelGateway, 
         counts = dict(state.get("retry_counts",{}))
         details = error.get("details")
         parts = details.get("target_object_ids", []) if isinstance(details, dict) else []
-        retry_key = f"{target}:{parts[0]}" if target and same_table(state) and len(parts) == 1 else target
+        # Placement repairs of one named part get their own per-node budget (e.g. "act:laser1"), so test-suite
+        # rewrites returning to Act cannot use up a misplaced part's repairs. Every key still counts toward
+        # TOTAL_RETRIES; no limit is raised.
+        placement = (state.get("simulation_backend") == "algorithm_v1" and error["stage"] == "output"
+                     and error.get("code") in ALGORITHM_PLACEMENT_CODES)
+        retry_key = (f"{target}:{parts[0]}" if target and (same_table(state) or placement) and len(parts) == 1
+                     else target)
         close_observation = (retry_key != target and target == "precision_vision_agent"
                              and details.get("failure_code") == "PACKED_CARRIER_LIFT_UNPROVEN")
         if close_observation:

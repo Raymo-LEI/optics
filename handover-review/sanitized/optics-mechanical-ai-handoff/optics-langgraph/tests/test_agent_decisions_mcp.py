@@ -186,7 +186,8 @@ def test_agent_run_end_to_end_makes_no_model_call(servers, no_cloud, quotes):
     assert [s["role"] for s in stops] == EXPECTED_ROLES
     assert len(stops) == 7  # exactly one awaiting_decision stop per decision, none more
     assert [r["to"] for r in state["retry_log"]] == ["controller", "controller", "act"]
-    assert state["retry_counts"] == {"controller": 2, "act": 1}
+    part = state["retry_log"][0]["retry_key"].split(":", 1)[1]  # the part the simulator misplaced
+    assert state["retry_counts"] == {f"controller:{part}": 2, f"act:{part}": 1}  # placement repairs count per part
     assert "pending_decision" not in state
     assert state["result"]["motions_sent"] == 0 and state["result"]["physical_verified"] is False
     assert state["agent_model"] == "external-agent"
@@ -357,13 +358,14 @@ def test_04_wrong_repair_operation_is_accepted_then_charged_exactly_like_the_ope
     assert read(team(data, run_id) / "controller-02/event.json")["error"]["code"] == "AGENT_RECOVERY_INVALID"
     assert after["retry_log"][-1]["code"] == "AGENT_RECOVERY_INVALID"
     assert after["retry_log"][-1]["from"] == after["retry_log"][-1]["to"] == "controller"
-    assert after["retry_counts"] == {"controller": before["retry_counts"]["controller"] + 1}
+    # an invalid decider answer charges the node's own budget, not the part's placement-repair budget
+    assert after["retry_counts"] == {**before["retry_counts"], "controller": before["retry_counts"].get("controller", 0) + 1}
     assert pending(runs, run_id)["node_attempt"] == 3 and pending(runs, run_id)["request_id"] != p["request_id"]
     drive(runs, run_id, evidence=evidence)
     final = run_json(data, run_id)
-    # the wasted controller retry leaves too little budget for the next position miss: an honest stop
-    assert final["status"] == "failed" and final["error"]["code"] == "ALGORITHM_POSITION_MISMATCH"
-    assert final["retry_log"][-1]["reason"] == "target_retry_limit"
+    # the wasted answer is charged to the Controller node's own budget; OBJ keeps its placement repairs and recovers
+    assert final["status"] == "algorithm_passed", final.get("error")
+    assert final["retry_counts"]["controller"] == 1 and final["retry_counts"]["controller:OBJ"] == 2
 
     # the OpenAI stand-in charges the same budget for the same wrong answer
     swapped = []
@@ -374,7 +376,7 @@ def test_04_wrong_repair_operation_is_accepted_then_charged_exactly_like_the_ope
             candidate["operation"] = "align"
         return candidate
     standin, _, _, _ = standin_run(tmp_path_factory.mktemp("standin"), monkeypatch, TELESCOPE, alter)
-    assert standin["status"] == final["status"] and standin["error"]["code"] == final["error"]["code"]
+    assert standin["status"] == final["status"] and standin.get("error") == final.get("error")
     keys = ("from", "to", "code", "reason", "retry_limit", "total_limit", "retry_counts", "total_retries", "attempt")
     assert [{k: r[k] for k in keys} for r in final["retry_log"]] == [{k: r[k] for k in keys} for r in standin["retry_log"]]
     assert final["retry_counts"] == standin["retry_counts"]
@@ -847,3 +849,27 @@ def test_hosted_backend_serves_the_same_agent_flow(tmp_path, monkeypatch):
             body = settle(client, run_id)
         assert roles == EXPECTED_ROLES and body["status"] == "algorithm_passed"
         assert tool(client, "get_worker_error", {"run_id": run_id})["display_state"] == "algorithm_passed"
+
+
+def test_rejected_test_suites_do_not_use_up_a_misplaced_parts_repairs(servers):
+    """Regression for a live run (Michelson, 2026-11-14): two reviews rejected the test suite (validator -> act, the
+    Act node's own budget), which then left no Act retry for the seeded part's angle repair, so the run stopped
+    with target_retry_limit. Placement repairs of one part now count under "act:<part>" / "controller:<part>";
+    every key still counts toward the total of 7 and no limit was raised."""
+    runs, evidence, data = servers
+    run_id = start_agent(runs)["run_id"]
+    rejections = []
+
+    def reject_tests_twice(p, answer):
+        if p["role"] == "review" and len(rejections) < 2:
+            rejections.append(1)
+            return {"accepted": False, "issues": ["Test coverage gap: no test checks component orientation (yaw)."],
+                    "return_to": "act", "reasoning": "The suite leaves orientation unchecked.", "problem_source": "tests"}
+        return answer
+    drive(runs, run_id, evidence=evidence, mutate=reject_tests_twice)
+    state = run_json(data, run_id)
+    assert len(rejections) == 2
+    assert state["status"] == "algorithm_passed", state.get("error")
+    assert [r["to"] for r in state["retry_log"]] == ["act", "act", "controller", "controller", "act"]
+    assert state["retry_counts"] == {"act": 2, "controller:OBJ": 2, "act:OBJ": 1}
+    assert state["retry_log"][-1]["total_retries"] == 5 <= state["retry_log"][-1]["total_limit"] == 7
