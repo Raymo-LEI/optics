@@ -1,0 +1,33 @@
+HALOFLUX by Ryder191 (RYDER CODE / Ms MAIKEBAIs CAT)
+https://github.com/Ryder191/haloflux
+
+Required Notice: Copyright (c) 2026 Ryder191 (RYDER CODE / Ms MAIKEBAIs CAT) - https://github.com/Ryder191/haloflux
+Required Notice: Noncommercial use only. Any commercial use is strictly prohibited. No commercial licenses are offered.
+
+Licensed under the PolyForm Noncommercial License 1.0.0; the full terms are in LICENSE in this folder.
+This copy is used here for a noncommercial purpose only. If this workbench is ever used inside or on behalf of a
+company, for a client or in paid work, remove this folder and the panel's "agent working" overlay first: the
+license prohibits that use and offers no commercial license.
+
+What is here
+- index.html, wp.js: the Wallpaper Engine edition (wallpaper/ in the upstream repository), unmodified, copied
+  from commit 02174503d0f391b1bb2537b8cad75e8e5f9997f2.
+- optics.html: a MODIFIED copy of index.html for this workbench. It keeps the original copyright notice and adds a
+  modification notice. Changes: optics vocabulary for the ring labels and the callout (physical laws such as the
+  thin-lens equation, never invented measurements), the random "METHODS" counter replaced by the run status the
+  panel sends, decorative numbers beside optics keys replaced by words or by the run's own design values, and a
+  small window.OPTICS bridge (setStatus, setVocab, setChecks, setTempo, pulse) the panel calls.
+- LICENSE: the upstream license file, unmodified.
+- Not included: wallpaper/audio/sw421k.mp3 (CC0 music, not covered by the license above). The panel turns the
+  music off, so the request for that file returns 404 and nothing plays.
+
+How the workbench uses it
+- optics_graph/server.py serves /haloflux/ (optics.html), /haloflux/upstream.html (the unmodified original),
+  wp.js and LICENSE, and nothing else.
+- optics_graph/panel.html fades the animation in as a full-window overlay while the selected run is working,
+  fades it out when the run stops working, and pauses it while hidden. The overlay credits "modified from
+  HALOFLUX by Ryder191 (RYDER CODE / Ms MAIKEBAIs CAT)" with a link to the repository.
+- The panel sets the upstream wallpaper properties at runtime (music off, side panels off) and feeds only real
+  run data through window.OPTICS: status, the design's component ids, parameters and target x positions, test
+  expressions, requirements and the decision being made. Bursts mark a node passing, flares a reroute.
+- The animation is decorative. Nothing in it is an optical measurement or hardware motion.

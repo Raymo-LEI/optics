@@ -1,0 +1,3 @@
+# Extra dependency for optics_graph.mcp_evidence / mcp_runs (Phase 1 MCP wrap).
+# Pinned to the 1.x line: the code uses mcp.server.fastmcp.FastMCP, which mcp 2.x renamed.
+mcp==1.30.0

@@ -1,0 +1,14 @@
+{
+  "mcpServers": {
+    "optics-evidence": {
+      "command": "${OPTICS_PROJ:-handover-review/sanitized/optics-mechanical-ai-handoff/optics-langgraph}/.venv/bin/python",
+      "args": ["-m", "optics_graph.mcp_evidence"],
+      "env": {"OPTICS_MCP_DATA_DIR": "${OPTICS_PROJ:-handover-review/sanitized/optics-mechanical-ai-handoff/optics-langgraph}/data-mcp"}
+    },
+    "optics-runs": {
+      "command": "${OPTICS_PROJ:-handover-review/sanitized/optics-mechanical-ai-handoff/optics-langgraph}/.venv/bin/python",
+      "args": ["-m", "optics_graph.mcp_runs"],
+      "env": {"OPTICS_MCP_DATA_DIR": "${OPTICS_PROJ:-handover-review/sanitized/optics-mechanical-ai-handoff/optics-langgraph}/data-mcp"}
+    }
+  }
+}

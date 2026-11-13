@@ -1,0 +1,1988 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>Optics Lab · LangGraph</title>
+<style>
+:root{color-scheme:dark;--bg:#11151a;--panel:#191f27;--line:#303945;--text:#e9edf2;--muted:#9ba9b9;--accent:#99c9b7;--warn:#edbc77}*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--text);font:15px/1.6 -apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}header{display:flex;justify-content:space-between;align-items:center;padding:23px 36px;border-bottom:1px solid var(--line)}h1{margin:0;font-size:23px;letter-spacing:.02em}h2{margin:0 0 14px;font-size:18px}h3{font-size:14px;color:var(--muted);font-weight:500;margin:0 0 8px}.badge{padding:4px 10px;border:1px solid var(--line);border-radius:20px;font-size:12px;color:var(--accent)}main{max-width:1500px;margin:auto;padding:28px;display:grid;grid-template-columns:minmax(260px,320px) minmax(0,1fr);gap:24px}section,.panel{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:22px;margin-bottom:20px}.muted{color:var(--muted);font-size:13px}p{margin:8px 0 15px}label{display:block;color:var(--muted);font-size:13px;margin:16px 0 6px}input,select,textarea,button{font:inherit}input,select,textarea{background:#10151b;color:var(--text);border:1px solid #3b4755;padding:10px 12px;border-radius:7px;width:100%}textarea{resize:vertical;min-height:130px}input[type=checkbox]{width:auto;margin-right:8px}button{background:var(--accent);color:#10241d;border:0;border-radius:7px;padding:10px 16px;cursor:pointer;font-weight:600}button:hover{filter:brightness(1.1)}button:disabled{opacity:.5;cursor:wait}.secondary{background:transparent;color:var(--text);border:1px solid var(--line)}.row{display:flex;gap:10px;align-items:center;flex-wrap:wrap}.wide{width:100%;margin-top:18px}.notice{padding:12px 14px;background:#25241f;border-left:3px solid var(--warn);color:#e0cda9;font-size:13px;border-radius:4px;margin:15px 0}.grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:20px}.stat{padding:16px;background:var(--panel);border:1px solid var(--line);border-radius:10px}.stat strong{display:block;margin-top:6px;font-size:16px}#history button{display:block;width:100%;text-align:left;margin-top:8px;background:#11171e;color:var(--text);font-weight:400;font-size:13px;border:1px solid var(--line)}#events{list-style:none;padding:0;margin:0}#events li{border-bottom:1px solid var(--line);padding:10px 0;font-size:14px}#events span{font-size:11px;color:var(--accent);display:block}details{margin:13px 0}summary{cursor:pointer;color:var(--accent)}pre{white-space:pre-wrap;word-break:break-word;background:#0e1319;border-radius:7px;padding:14px;max-height:440px;overflow:auto;font-size:12px;color:#c7d4e2}.error{color:#f0ae9e}#toast{position:fixed;bottom:24px;right:24px;padding:13px 20px;border:1px solid var(--line);border-radius:8px;background:#243a31;max-width:500px;display:none}table{border-collapse:collapse;width:100%;font-size:13px}th,td{text-align:left;padding:9px;border-bottom:1px solid var(--line)}th{color:var(--muted);font-weight:400}a{color:var(--accent)}@media(max-width:900px){main{grid-template-columns:1fr;padding:16px}header{padding:20px}.grid{grid-template-columns:1fr}aside{order:0}}
+
+:root{--flow-bg:#111820;--flow-muted:#778a9d;--live:#b6e6d3;--fail:#ffad99}
+header{gap:12px}.badge{white-space:nowrap}
+#live-section{padding:20px}
+#live-section > h2{margin-bottom:16px}
+.live-card{background:var(--flow-bg);border:1px solid var(--line);border-radius:9px;min-width:0;padding:14px}
+.live-card h3{font-size:14px;color:var(--text);font-weight:600;margin:0 0 12px}
+.flow-readout{display:grid;grid-template-columns:1fr 1fr;gap:9px;margin:0 0 13px}
+.flow-readout div{min-width:0}.flow-readout dt{font-size:11px;color:var(--muted)}.flow-readout dd{margin:3px 0 0;font-size:12px;overflow-wrap:anywhere}
+#live-section{margin:0}
+main{max-width:1770px;align-items:start}
+main>aside{grid-column:1;grid-row:3}
+#live-section{grid-column:1/-1;grid-row:2}
+#run-section{grid-column:2;grid-row:3}
+#experiment-form{grid-column:1;grid-row:1;margin:0}#experiment-form textarea{min-height:72px}main>.grid{grid-column:2;grid-row:1;margin:0}#run-picker{grid-column:1/-1;margin:0}#run-picker select{margin-top:5px}
+.graph-tools{justify-content:space-between;margin-bottom:12px}.graph-tools h2{margin:0}
+.graph-tools button,.round-tabs button{padding:5px 10px;font-size:13px}
+.graph-tools .row{gap:6px}
+#graph-window{margin:0;border:1px solid var(--line);border-radius:10px;background:#101720;overflow:auto;overscroll-behavior:contain}
+#node-map{display:block;width:100%;min-width:880px;height:auto}
+.map-lane{fill:#17222e;stroke:#2c3947}.map-lane-title{fill:#adc0d1;font-size:13px;font-weight:600}
+.map-node{cursor:pointer;outline:none}
+.map-node rect{fill:#1c2732;stroke:#506377;stroke-width:1.2}.map-node text{fill:#e7edf4;font-size:14px;pointer-events:none}
+.map-node .map-state{fill:#adbdcc;font-size:12px}
+.map-node:focus-visible rect,.map-node.selected rect{stroke:#b5d8fe;stroke-width:2.5}
+.map-node.passed rect{fill:#1b302e;stroke:#659989}.map-node.failed rect{fill:#392b2b;stroke:#d5937c}
+.map-node.current rect{fill:#263e37;stroke:#bbefda;stroke-width:2.5;animation:graph-live 1.5s infinite alternate}
+.map-node.next rect{stroke:#a2bbd1;stroke-dasharray:5 4}.map-node.feedback rect{fill:#3b3124;stroke:#d5aa66}
+.map-edge{fill:none;stroke-width:1.5;pointer-events:none}.map-edge.branch{stroke-dasharray:4 5}
+.map-edge.visited{stroke-width:2}.map-edge.feedback{stroke-width:2.4}.map-edge.next{stroke-width:2;stroke-dasharray:5 4}
+@keyframes graph-live{to{stroke:#7da995}}
+.graph-legend{display:flex;flex-wrap:wrap;gap:6px 16px;margin:10px 0 13px;color:var(--muted);font-size:12px}
+.graph-legend span::before{content:"";display:inline-block;width:16px;border-top:2px solid var(--swatch);vertical-align:middle;margin-right:5px}
+.graph-legend .alternate::before{border-top-style:dashed}
+#graph-inspector{margin:8px 0 13px;overflow-wrap:anywhere}
+#graph-panel{min-width:0}
+#graph-dialog{width:calc(100% - 24px);max-width:1750px;height:calc(100% - 24px);max-height:none;overflow:auto;background:var(--panel);color:var(--text);border:1px solid var(--line);border-radius:12px;padding:18px}
+#graph-dialog::backdrop{background:#05080ddc}
+.graph-details{display:grid;grid-template-columns:minmax(0,1.25fr) minmax(0,1fr);gap:14px;align-items:start}
+.round-tabs{margin:8px 0 12px;gap:5px}
+.round-tabs button[aria-pressed=true],#graph-scope[aria-pressed=true]{border-color:#a4cdbf;background:#243931}
+.trace-list{margin:0;padding:0;list-style:none}
+.trace-list li{border-left:2px solid var(--line);padding:4px 0 10px 11px;overflow-wrap:anywhere}
+.trace-list li[data-outcome=failed]{border-color:#d5937c}.trace-list li[data-outcome=feedback]{border-color:#d5aa66}
+.trace-list li[data-outcome=passed]{border-color:#659989}
+.trace-meta{display:flex;gap:4px 9px;align-items:baseline;flex-wrap:wrap;font-size:12px;color:var(--muted)}
+.trace-meta strong{font-size:13px;color:var(--text)}.trace-list p{margin:3px 0;font-size:13px}
+.trace-list details{margin:4px 0;font-size:12px}.trace-list pre{margin:6px 0;padding:8px}
+.trace-summary{margin:0 0 10px}
+#trace-scroll{position:relative;max-height:390px;overflow:auto;overscroll-behavior:contain;padding-right:6px}
+#graph-dialog #trace-scroll{max-height:none}
+@media(max-width:760px){.graph-details{grid-template-columns:1fr}}
+@media(max-width:900px){main>aside,main>.grid,#live-section,#run-section,#experiment-form{grid-column:1;grid-row:auto}main>aside{order:0}#experiment-form{order:-3}main>.grid{order:-2}#live-section{order:-1}}
+@media(prefers-reduced-motion:reduce){.map-node.current rect{animation:none}}
+.playback-frame{position:relative;aspect-ratio:1.39;background:#0b141c;border:1px solid #30404d;border-radius:7px;overflow:hidden}
+.playback-frame canvas{display:block;width:100%;height:100%}
+.playback-empty{position:absolute;inset:0;display:grid;place-content:center;text-align:center;padding:16px;
+  color:#bdcbd8;font-size:12px;background:radial-gradient(ellipse at center,#162631 0%,#0d1721 78%)}
+.playback-empty[hidden]{display:none}
+.playback-controls{display:grid;grid-template-columns:auto minmax(0,1fr);gap:8px 11px;align-items:center;margin-top:12px}
+.playback-controls button{padding:5px 11px;min-width:54px;font-size:12px}
+.playback-controls button:disabled{cursor:default}
+.playback-controls input{width:100%;margin:0;padding:0;accent-color:var(--accent)}
+.playback-readout{display:flex;justify-content:space-between;gap:10px;color:#a9bbca;font:11px/1.5 ui-monospace,monospace;margin-top:9px}
+.playback-legend{display:flex;gap:6px 14px;flex-wrap:wrap;list-style:none;margin:10px 0 0;padding:0;color:#b2c1cf;font-size:11px}
+.playback-legend li{display:flex;align-items:center;gap:5px}.playback-legend li::before{content:"";display:block;width:7px;height:7px;border-radius:2px;background:var(--legend-color)}
+.playback-note{margin:9px 0 0}
+#history button[aria-current=true]{border-color:var(--accent);background:#203229}
+@media(max-width:620px){header{flex-wrap:wrap;padding:16px}.grid{grid-template-columns:1fr 1fr}.grid .stat:last-child{grid-column:1/-1}.stat{padding:11px}section,#live-section{padding:14px}}
+
+
+#run-controls{margin:0 0 12px}#run-controls[hidden]{display:none}.run-danger{border-color:#ac695c;color:#ffc1b2}
+#connection{margin:0 0 10px;color:var(--warn)}
+#algorithm-table{display:block;width:100%;height:auto;background:#0c151e;border:1px solid var(--line);border-radius:8px}
+#algorithm-view .row{margin-bottom:8px}.algorithm-pose text{fill:var(--text);font-size:13px}
+#algorithm-evidence td{overflow-wrap:anywhere}
+.experiment-summary{margin:0 0 16px;overflow-wrap:anywhere}
+.experiment-summary h3{color:var(--text);font-size:17px;font-weight:600}
+.experiment-summary h4{margin:10px 0 0;font-size:13px}
+.experiment-summary ul{margin:2px 0 0;padding-left:20px;font-size:13px}
+@media(min-width:1000px){
+  #graph-dialog:has(.algorithm-panel){overflow:hidden}
+  #graph-dialog .algorithm-panel{display:grid;grid-template-columns:minmax(0,1.3fr) minmax(0,1fr);gap:18px;height:100%;align-items:start}
+  #graph-dialog .algorithm-panel .graph-overview{min-width:0;max-height:100%;overflow:auto}
+  #graph-dialog .algorithm-panel .graph-details{display:block;max-height:100%;overflow:auto;padding-right:6px;overscroll-behavior:contain}
+  #graph-dialog .algorithm-panel .graph-details>.live-card+.live-card{margin-top:12px}
+  #graph-dialog .algorithm-panel #trace-scroll{overflow:visible;overscroll-behavior:auto;max-height:none}
+  #graph-dialog .algorithm-panel #node-map{min-width:0}
+}
+.language-controls{display:grid;gap:5px;max-width:280px}.language-controls select,.graph-tools select{width:auto;padding:6px 9px}.language-controls select{justify-self:start}#table-workbench .table-tools{display:flex;margin:6px 0 10px;gap:7px}
+.table-tools button{padding:5px 8px;font-size:12px}.table-tools label{margin:0}
+.table-layout{min-width:0}.table-layout>div{padding:8px 0;overflow-wrap:anywhere}
+.table-layout ul{margin:5px 0;padding-left:18px}.table-layout dt{font-weight:600}.table-layout dd{margin:0 0 5px}
+.table-layout select{padding:4px 6px;margin:4px 0 8px}
+#algorithm-table{touch-action:none;cursor:grab;aspect-ratio:520/285}
+#algorithm-table[data-dragging]{cursor:grabbing}.algorithm-pose{cursor:pointer}
+.algorithm-pose:focus-visible .pose-hit{stroke:var(--text);stroke-width:1.5}
+.algorithm-pose .pose-label{font-size:10px;paint-order:stroke;stroke:#0c151e;stroke-width:3px}
+#table-dialog{box-sizing:border-box;width:min(1220px,96vw);max-width:none;max-height:94vh;background:var(--panel);color:var(--text);border:1px solid var(--line);border-radius:12px;padding:14px}
+#table-dialog::backdrop{background:rgba(8,12,16,.78)}
+@media(min-width:860px){#table-dialog .table-layout{display:grid;grid-template-columns:minmax(0,1fr) 240px;gap:14px}}
+#table-dialog #algorithm-table{max-height:70vh}
+#translation-notice{grid-column:1/-1;margin:0}
+#translation-notice[hidden]{display:none}
+#artifact-preview{box-sizing:border-box;width:min(900px,96vw);max-width:none;max-height:94vh;background:var(--panel);color:var(--text);border:1px solid var(--line);border-radius:12px;padding:14px}
+#artifact-preview::backdrop{background:rgba(8,12,16,.78)}
+#artifact-preview pre{max-height:66vh}
+#experiment-samples{margin-top:6px}#experiment-samples button{padding:5px 8px;font-size:12px}
+/* "Agent working" overlay: HALOFLUX by Ryder191, PolyForm Noncommercial 1.0.0 (vendor/haloflux/NOTICE.txt) */
+#agent-overlay{position:fixed;inset:0;z-index:50;background:#050608;overflow:hidden;opacity:0;visibility:hidden;transform:scale(1.04);filter:blur(8px);
+  transition:opacity .8s ease,transform 1s cubic-bezier(.2,.7,.2,1),filter .8s ease,visibility 0s linear 1s}
+#agent-overlay.on{opacity:1;visibility:visible;transform:none;filter:none;transition:opacity .8s ease,transform 1s cubic-bezier(.2,.7,.2,1),filter .8s ease,visibility 0s}
+#agent-overlay iframe{position:absolute;inset:0;width:100%;height:100%;border:0;pointer-events:none}
+.agent-hud{position:absolute;left:16px;right:16px;bottom:16px;display:flex;flex-wrap:wrap;gap:10px 18px;align-items:center;justify-content:space-between;
+  padding:12px 16px;background:rgba(10,14,18,.72);border:1px solid rgba(153,201,183,.25);border-radius:10px;backdrop-filter:blur(6px);font-size:13px;
+  opacity:0;transform:translateY(12px);transition:opacity .6s ease .35s,transform .6s ease .35s}
+#agent-overlay.on .agent-hud{opacity:1;transform:none}
+.agent-hud strong{display:flex;align-items:center;gap:8px;color:var(--live);font-weight:600}
+.agent-hud strong::before{content:"";width:8px;height:8px;border-radius:50%;background:var(--live);animation:agent-pulse 1.6s ease-in-out infinite}
+@keyframes agent-pulse{50%{opacity:.25}}
+.agent-hud-run{min-width:0;flex:1 1 260px}.agent-hud-run span{display:block;color:var(--muted);font-size:12px;overflow-wrap:anywhere}
+.agent-hud-side{display:flex;align-items:center;gap:14px;flex-wrap:wrap}.agent-hud-side .muted{font-size:12px}
+.agent-hud button{padding:6px 12px;font-size:12px}
+.agent-credit{position:absolute;top:12px;right:16px;font-size:11px;color:#8996a5;background:rgba(5,6,8,.55);padding:3px 8px;border-radius:5px}
+.agent-credit a{color:#b9c6d3}
+#toast{z-index:60}
+#decider-note{margin:6px 0 0;font-size:12px}#decider-status{margin:0 0 12px;font-size:13px;color:var(--muted)}#decider-status.error{color:#f0ae9e}
+#decider-status button{padding:4px 10px;font-size:12px}#agent-overlay-decider{display:block;color:var(--accent);font-size:12px}
+</style></head><body>
+<header><div><h1>Optics Lab <span style="color:var(--accent)">/</span> LangGraph</h1><div class="muted"><span data-ui>Trace requirements, layouts, checks, and execution in one workflow</span></div></div><span class="badge"><span data-ui>Local workbench · Hardware disabled</span></span></header>
+<main><section id="experiment-form"><h2><span data-ui>Run an experiment</span></h2>
+<label for="request"><span data-ui>Experiment requirements</span></label>
+<textarea rows="2" id="request" maxlength="8000" required placeholder="Example: Build a Fabry–Pérot cavity with a laser, input mirror, output mirror, and detector." data-ui-placeholder="Example: Build a Fabry–Pérot cavity with a laser, input mirror, output mirror, and detector."></textarea>
+<div class="row" id="experiment-samples" aria-label="Experiment examples" data-ui-aria-label="Experiment examples">
+<button class="secondary" type="button" data-example="kepler">Kepler</button><button class="secondary" type="button" data-example="michelson">Michelson</button><button class="secondary" type="button" data-example="opa">OPA</button>
+</div>
+<label for="decider"><span data-ui>Decisions by</span></label>
+<select id="decider"><option value="claude">Claude Code · your Claude sign-in, no API key</option><option value="codex">Codex CLI · your ChatGPT sign-in, no API key</option><option value="openai">OpenAI API key · Model settings below</option></select>
+<p class="muted" id="decider-note"></p>
+<button class="wide" id="start"><span data-ui>Create and run an algorithm test</span></button>
+<p class="muted"><span data-ui>Describe the goal, components, optical path, and constraints. The model extracts requirements, designs the layout, and reviews it. The local algorithm simulates execution, fault injection, and retesting.</span></p>
+<details><summary><span data-ui>Model settings</span></summary><p class="muted"><span data-ui>This model handles requirements, design, review, test generation, and correction decisions. The app sets no output token cap. Model or service limits can still truncate output.</span></p><p id="model-status" class="muted"><span data-ui>Loading settings…</span></p><label for="model"><span data-ui>Model ID</span></label><input id="model" value="gpt-6.1-sol" autocomplete="off"><label for="api-key"><span data-ui>Update API key</span></label><input id="api-key" type="password" placeholder="Leave blank if already configured" data-ui-placeholder="Leave blank if already configured" autocomplete="new-password"><button class="secondary wide" id="save"><span data-ui>Save local settings</span></button></details>
+</section>
+<aside><section><h2><span data-ui>Recent runs</span></h2><div id="history"><p class="muted"><span data-ui>No runs yet</span></p></div></section></aside>
+<div class="grid"><div class="stat"><h3><span data-ui>Run status</span></h3><strong id="status"><span data-ui>Not started</span></strong></div><div class="stat"><h3><span data-ui>Node progress</span></h3><strong id="stage"><span data-ui>Waiting for input</span></strong></div><div class="stat"><h3><span data-ui>Run evidence</span></h3><strong id="kind">—</strong></div><label id="run-picker" for="run-select"><span data-ui>Select run</span><select id="run-select"><option value="" data-ui>Loading runs…</option></select></label>
+</div>
+<div id="translation-notice" class="row" hidden><span id="translation-status" class="muted" role="status"></span><button type="button" id="translation-retry" class="secondary" hidden><span data-ui>Retry translation</span></button></div><section id="live-section"><div id="graph-home"><div id="graph-panel">
+  <div class="graph-overview"><div class="row graph-tools"><h2 id="graph-title"><span data-ui>LangGraph node map</span></h2>
+    <div class="row">
+      <button class="secondary" type="button" id="graph-scope" aria-pressed="false"><span data-ui>Show full graph</span></button>
+      <button class="secondary" type="button" id="graph-smaller" aria-label="Zoom out of node map" data-ui-aria-label="Zoom out of node map">−</button>
+      <button class="secondary" type="button" id="graph-fit"><span data-ui>Fit to width</span></button>
+      <button class="secondary" type="button" id="graph-larger" aria-label="Zoom in on node map" data-ui-aria-label="Zoom in on node map">＋</button>
+      <button class="secondary" type="button" id="graph-expand"><span data-ui>Expand map</span></button>
+    </div>
+  </div>
+  <div class="row" id="run-controls" hidden>
+  <button class="secondary" id="pause-run" type="button"><span data-ui>Pause</span></button>
+  <button class="secondary" id="resume-run" type="button"><span data-ui>Resume</span></button>
+  <button class="secondary run-danger" id="stop-run" type="button"><span data-ui>Stop</span></button>
+  <span class="muted" id="control-note"><span data-ui>Pause and stop take effect between nodes</span></span>
+</div>
+  <div id="decider-status" class="row" role="status" hidden><span id="decider-text"></span><button type="button" class="secondary" id="decider-retry" hidden>Retry</button></div>
+  <p id="connection" role="status" hidden><span data-ui>Live connection lost. Showing the latest confirmed data while reconnecting.</span></p>
+  <div id="graph-experiment"></div>
+  <p id="graph-error" class="error" role="status" hidden></p>
+  <dl class="flow-readout" aria-live="polite">
+    <div><dt id="current-caption"><span data-ui>Current node</span></dt><dd id="flow-current"><span data-ui>Waiting for input</span></dd></div>
+    <div><dt id="next-caption"><span data-ui>Next step</span></dt><dd id="flow-next">—</dd></div>
+  </dl>
+  <div id="graph-window" tabindex="0" aria-label="Node map, scroll horizontally" data-ui-aria-label="Node map, scroll horizontally"><svg id="node-map" role="group" aria-label="LangGraph nodes and retry paths" data-ui-aria-label="LangGraph nodes and retry paths"></svg></div>
+  <div class="graph-legend">
+    <span class="alternate" style="--swatch:#536479"><span data-ui>Unused optional branch</span></span>
+    <span style="--swatch:#8bd2b9"><span data-ui>Visited</span></span><span style="--swatch:#d5aa66"><span data-ui>Feedback and retries</span></span><span style="--swatch:#d5937c"><span data-ui>Failed node</span></span>
+  </div>
+  <p id="graph-inspector" class="muted"><span data-ui>Select a node to see its records. Select a round to highlight its path.</span></p>
+  <details><summary><span data-ui>View raw LangGraph definition</span></summary><pre id="graph"><span data-ui>Loading…</span></pre></details>
+  </div>
+  <div class="graph-details"><div class="live-card" id="trace-card">
+    <h3><span data-ui>Execution and feedback by round</span></h3>
+    <div class="row round-tabs" id="trace-rounds" aria-label="Select execution round" data-ui-aria-label="Select execution round"></div>
+    <p class="muted trace-summary" id="trace-summary"><span data-ui>Node outputs and retries appear here after the run starts.</span></p>
+    <div id="trace-scroll" tabindex="0" aria-label="Run details" data-ui-aria-label="Run details"><ol class="trace-list" id="trace-events"></ol></div>
+  </div>
+  <div class="live-card" id="graph-playback">
+    <h3 id="playback-title"><span data-ui>Algorithm workbench</span></h3>
+    <div id="algorithm-view">
+      <p id="algorithm-caption" class="muted"><span data-ui>Waiting for model design and workbench observations.</span></p>
+      <div id="table-home"><div id="table-workbench">
+        <div class="row table-tools">
+          <button class="secondary" type="button" id="table-out" aria-label="Zoom out of workbench" data-ui-aria-label="Zoom out of workbench">−</button>
+          <button class="secondary" type="button" id="table-fit"><span data-ui>Fit to width</span></button>
+          <button class="secondary" type="button" id="table-in" aria-label="Zoom in on workbench" data-ui-aria-label="Zoom in on workbench">＋</button>
+          <label><input id="table-supports" type="checkbox"><span data-ui>Show supports and structures</span></label>
+          <button class="secondary" type="button" id="table-expand"><span data-ui>Expand workbench</span></button>
+        </div>
+        <div class="table-layout">
+          <svg id="algorithm-table" viewBox="0 0 520 285" tabindex="0" role="group" aria-label="Interactive workbench top view" data-ui-aria-label="Interactive workbench top view" aria-describedby="table-help"></svg>
+          <div id="table-selection" class="muted"></div>
+        </div>
+        <small id="table-help" class="muted" data-ui>Drag to pan. With the workbench focused, use the arrow keys to pan and the plus or minus key to zoom.</small>
+      </div></div>
+      <dialog id="table-dialog" aria-label="Algorithm workbench" data-ui-aria-label="Algorithm workbench"></dialog>
+      <ul class="playback-legend" aria-label="Algorithm workbench legend" data-ui-aria-label="Algorithm workbench legend">
+        <li style="--legend-color:#81b8e8"><span data-ui>Design target</span></li><li style="--legend-color:#bbabe9"><span data-ui>Design connection direction</span></li><li style="--legend-color:#99c9b7"><span data-ui>Current pose</span></li>
+        <li style="--legend-color:#edbc77"><span data-ui>Moved this round</span></li><li style="--legend-color:#ffad99"><span data-ui>Position or angle out of tolerance</span></li>
+      </ul>
+      <p class="muted playback-note"><span data-ui>The top view shows design connections and the workbench positions and headings. The records below include height, angle, and error.</span></p>
+      <details><summary><span data-ui>View component coordinates and deviations</span></summary><div id="algorithm-evidence"></div></details>
+    </div>
+    <div id="cartesian-replay" hidden><div class="playback-frame" id="playback-frame">
+      <canvas id="sim-canvas" role="img" aria-hidden="true" aria-label="Optical table drawn from MuJoCo poses. Tool coordinates are available below." data-ui-aria-label="Optical table drawn from MuJoCo poses. Tool coordinates are available below."></canvas>
+      <div class="playback-empty" id="playback-status" role="status"><span data-ui>Replay appears after Output validation</span></div>
+    </div>
+    <div class="playback-controls">
+      <button class="secondary" id="play" type="button" disabled><span data-ui>Play</span></button>
+      <input id="scrubber" aria-label="Simulation time" data-ui-aria-label="Simulation time" type="range" min="0" max="0" value="0" step="1" disabled>
+    </div>
+    <div class="playback-readout"><span id="sim-time">— s</span><span id="sim-waypoint"></span></div>
+    <p class="muted playback-note" id="sim-tool"></p>
+    <ul class="playback-legend" id="sim-legend" aria-label="Simulation legend" data-ui-aria-label="Simulation legend"></ul>
+    <p class="muted playback-note"><span data-ui>Workbench and tool positions come from validated pose records.</span></p></div>
+    <div id="precision-replay" hidden><p id="precision-video-status" class="muted"></p>
+      <video id="precision-video" controls preload="none" style="width:100%" hidden></video>
+    </div>
+  </div>
+  </div>
+</div></div></section>
+<section id="run-section"><div><div class="row" style="justify-content:space-between"><h2><span data-ui>Run details</span></h2><span class="muted" id="run-id"><span data-ui>Select a run to see its details</span></span></div><p id="summary" class="muted"><span data-ui>Motion, placement error, corrections, and optical checks appear after the local simulation.</span></p><div id="review-controls" style="display:none"><div class="notice"><span data-ui>The workflow has been saved and paused. Review the layout, plan, and validation below. Approval keeps the workflow in simulation.</span></div><div class="row"><button id="approve"><span data-ui>Approve this plan</span></button><button id="reject" class="secondary"><span data-ui>Reject</span></button></div></div><button id="continue" class="secondary" style="display:none"><span data-ui>Resume interrupted workflow</span></button><pre id="error" class="error" style="display:none"></pre><details><summary><span data-ui>View brief run log</span></summary><ol id="events"></ol></details>
+<section id="precision-evidence" hidden>
+  <h3><span data-ui>Camera, pick-and-place, and optical records</span></h3>
+  <p id="precision-progress"></p>
+  <details id="precision-transfer-plans" hidden>
+    <summary><span data-ui>Transfer and return planning records</span></summary>
+    <ul id="precision-transfer-plan-list"></ul>
+  </details>
+  <div id="precision-attempts"></div>
+  <p id="precision-links"></p>
+</section>
+<div id="simulation-summary"></div><div id="components"></div><details><summary><span data-ui>Target layout and user constraints</span></summary><pre id="layout"><span data-ui>None</span></pre></details><details><summary><span data-ui>Layout and plan validation</span></summary><pre id="validation"><span data-ui>None</span></pre></details><details><summary><span data-ui>Bound motion plan</span></summary><pre id="plan"><span data-ui>None</span></pre></details><details><summary><span data-ui>Execution results and evidence</span></summary><pre id="result"><span data-ui>None</span></pre></details></div></section>
+</main><dialog id="graph-dialog" aria-labelledby="graph-title"></dialog><div id="toast" role="status"></div>
+<div id="agent-overlay" aria-label="Agent working">
+  <p class="agent-credit">Animation modified from <a href="https://github.com/Ryder191/haloflux" target="_blank" rel="noopener noreferrer">HALOFLUX by Ryder191 (RYDER CODE / Ms MAIKEBAIs CAT)</a> · noncommercial use only</p>
+  <div class="agent-hud">
+    <div class="agent-hud-run"><strong>Agent working</strong><span id="agent-overlay-decider"></span><span id="agent-overlay-run"></span></div>
+    <div class="agent-hud-side"><span class="muted">Simulation only · no hardware moves</span><button type="button" class="secondary" id="agent-overlay-hide">Show panel</button></div>
+  </div>
+</div>
+<dialog id="artifact-preview" aria-labelledby="artifact-preview-title">
+  <div class="row">
+    <h2 id="artifact-preview-title">English preview</h2>
+    <form method="dialog"><button class="secondary"><span data-ui>Close</span></button></form>
+  </div>
+  <p class="muted" data-ui>Downloads contain source files. Preview text is for display.</p>
+  <div class="row"><a id="artifact-original" download><span data-ui>Download original evidence</span></a><button class="secondary" type="button" id="artifact-retry" hidden><span data-ui>Retry translation</span></button></div>
+  <p id="artifact-status" role="status"></p><pre id="artifact-content" hidden></pre>
+</dialog>
+<script>
+const language = 'en';
+const ui = text => text;
+function localizedLabels(labels) {
+  return Object.defineProperties({}, Object.fromEntries(Object.entries(labels).map(([key,text])=>
+    [key, {enumerable:true, get:()=>ui(text)}])));
+}
+const staticText = [...document.querySelectorAll('[data-ui]')].map(node=>[node,node.textContent]);
+const staticAttributes = ['aria-label','placeholder'].flatMap(name=>
+  [...document.querySelectorAll('[data-ui-'+name+']')].map(node=>[node,name,node.getAttribute('data-ui-'+name)]));
+const languageSelects = [...document.querySelectorAll('[data-language]')];
+function renderLanguage() {
+  document.documentElement.lang = language;
+  for (const [node,text] of staticText) node.textContent = ui(text);
+  for (const [node,name,text] of staticAttributes) node.setAttribute(name,ui(text));
+  for (const select of languageSelects) select.value = language;
+}
+
+const $=id=>document.getElementById(id);let current=null,lastState=null;
+const hasHan = text => /\p{Script=Han}/u.test(text);
+let presentation = null;
+let presentationRequest = null;
+let presentationNextCheck = 0;
+let missingPresentationText = new Set();
+function human(text, fallback='…') {
+  if (typeof text!=='string' || language!=='en' || !hasHan(text)) return text;
+  const translation = presentation?.runId===current && Object.hasOwn(presentation.translations,text)
+    ? presentation.translations[text] : null;
+  if (typeof translation==='string' && translation.trim() && !hasHan(translation)) return translation;
+  missingPresentationText.add(text);
+  return fallback;
+}
+function displayCopy(value, translateKeys=false) {
+  if (language!=='en') return value;
+  if (typeof value==='string') return human(value);
+  if (Array.isArray(value)) return value.map(item=>displayCopy(item,translateKeys));
+  if (value && typeof value==='object') {
+    return Object.fromEntries(Object.entries(value).map(([key,item],index)=>[translateKeys?human(key,'untranslated_key_'+index):key,displayCopy(item,translateKeys)]));
+  }
+  return value;
+}
+function displayJson(value) {
+  return JSON.stringify(displayCopy(value,true),null,2);
+}
+function showTranslationStatus() {
+  const note=$('translation-status');
+  const status=presentation?.runId===current?presentation.status:null;
+  $('translation-notice').hidden=language!=='en' || !current || (!missingPresentationText.size && status!=='translating');
+  $('translation-retry').hidden=status!=='failed';
+  note.textContent=status==='failed'
+    ? 'English translation unavailable. Original files are available as downloads.'
+    : status==='ready' ? 'Some English text is unavailable. Original files are available as downloads.'
+    : 'Preparing English translations…';
+}
+async function refreshPresentation(retry=false) {
+  const runId=current;
+  if (language!=='en' || !runId || !lastState || !missingPresentationText.size ||
+      presentationRequest===runId || (!retry && (Date.now()<presentationNextCheck || presentation?.status==='failed'))) return;
+  const checkedText=new Set(missingPresentationText);
+  if (!retry && presentation?.status==='ready' && [...checkedText].every(text=>presentation.checkedText?.has(text))) return;
+  presentationRequest=runId;
+  presentationNextCheck=Date.now()+2500;
+  try {
+    const result=await api('/api/runs/'+encodeURIComponent(runId)+'/presentation?language=en'+(retry?'&retry=true':''));
+    if (current!==runId) return;
+    presentation={runId,status:result.status,translations:result.translations || {},checkedText};
+    if (language==='en' && lastState) render(lastState);
+  } catch {
+    if (current!==runId) return;
+    presentation={runId,status:'failed',translations:presentation?.runId===runId?presentation.translations:{}};
+    showTranslationStatus();
+  } finally {
+    if (presentationRequest===runId) presentationRequest=null;
+  }
+}
+$('translation-retry').onclick=()=>{void refreshPresentation(true)};
+const labels=localizedLabels({context:"Scene",interpret:"Interpret requirements",optics_agent:"Optical design",layout_validator:"Validate layout",coding_agent:"Motion plan",plan_validator:"Validate plan",simulate:"Run backend",output_validator:"Validate results",diagnose_simulation:"Automatic diagnosis",review:"Manual review",execution_gate:"Execution gate",finalize:"Finalize",legacy_backend:"Legacy case adapter",feedback_router:"Failure feedback",exhausted:"Revision budget exhausted"});
+const precisionAgents={precision_vision_agent:"Vision correction agent",precision_motion_agent:"Motion correction agent",precision_optics_agent:"Optical alignment agent",precision_metrology_agent:"Metrology correction agent"};
+const teamLabels=localizedLabels({precision_sim:"RGB camera · xArm7 pick-and-place and optical alignment",precision_output:"Independent mechanical and optical acceptance",input:"Input",vision:"Vision / PROB0",prompt:'Prompt',act:'Act',validator:'Validator',controller:'Controller',sim:'Sim',output:'Output',mode:'Mode',safety_gate:"Review",execution:'Execution · L1',done:"Complete",feedback_router:"Feedback router",failed:"Stop",rejected:"Rejected at review",precision_repair:"Single-component correction on the same table",...precisionAgents});
+const teamNext={precision_sim:'precision_output',precision_repair:'precision_output',precision_output:'done',vision:'prompt',prompt:'act',act:'validator',validator:'controller',controller:'sim',sim:'output',output:'mode',safety_gate:'execution',execution:'done'};
+const agentNodes=Object.keys(precisionAgents);
+const precisionExecutions=new Set(['precision_sim','precision_repair']);
+const isAlgorithm=s=>s?.simulation_backend==='algorithm_v1';
+const isPrecisionRun=s=>!isAlgorithm(s) && (s.selected_experiment==='michelson_full' || s.precision_kind==='mzi_contact');
+const usesSameTable=s=>s.precision_protocol==='same_table_v1';
+const precisionAttempt=(s,event)=>event ? event.simulation_attempt ?? event.attempt : s.live_precision_attempt ?? s.live_attempt;
+const phaseNext={interpret:'optics_agent',optics_agent:'layout_validator',layout_validator:'coding_agent',coding_agent:'plan_validator',plan_validator:'simulate',simulate:'output_validator',review:'execution_gate',execution_gate:'finalize',legacy_backend:'finalize',exhausted:'finalize'};
+const statuses=localizedLabels({algorithm_passed:"Algorithm workflow passed",pause_requested:"Pause requested at next node boundary",stop_requested:"Stop requested at next node boundary",paused:"Paused",stopped:"Stopped",team_precision_passed:"Mechanical and optical acceptance passed",team_l1_passed:"Same ROSi plan accepted by L1",team_sim_passed:"Simulation and evidence accepted",queued:"Queued",running:"Running",failed:"Failed and stopped",blocked:"Waiting for external configuration",awaiting_review:"Awaiting review",awaiting_decision:"Waiting for an agent decision",interrupted:"Interrupted",rejected:"Rejected",design_ready:"Design and plan accepted",protocol_passed:"Protocol test passed",local_sim_passed:"Local MuJoCo validation passed",remote_runtime_passed:"Remote runtime check passed",historical_evidence:"Historical evidence loaded",simulation_passed:"Simulation passed",executing:"Executing",resuming:"Resuming",waiting_for_worker:"Waiting for the worker (queued behind another run, or the runtime lock is busy)",not_executing_here:"Not executing in this server (may be running in another process, or interrupted)"});
+const stateLabel=r=>statuses[r.display_state] || statuses[r.status] || r.status;
+const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+function eventMessage(event) {
+  const {stage,attempt,message,outcome}=event;
+  const recordedPass=ui('Attempt {attempt} passed').replace('{attempt}',attempt);
+  if (language==='en' && outcome==='passed' && message===stage+' Round '+attempt+'Passed') return recordedPass;
+  return message;
+}
+function toast(msg){$('toast').textContent=human(msg,ui('Action did not complete. Check the run record.'));$('toast').style.display='block';setTimeout(()=>$('toast').style.display='none',5000)}
+async function api(path,body){const r=await fetch(path,body===undefined?{signal:AbortSignal.timeout(10000),headers:{'X-Optics-Local':'1'}}:{method:'POST',headers:{'Content-Type':'application/json','X-Optics-Local':'1'},body:JSON.stringify(body)});const j=await r.json();if(!r.ok)throw Error(typeof j.detail==='string'?j.detail:ui("Invalid request. Check the input."));return j}
+let modelSettings;
+function renderModelSettings() {
+  $('model-status').textContent = !modelSettings ? ui('Loading settings…') : modelSettings.key_configured
+    ? ui('API key saved locally · ') + human(modelSettings.model)
+    : ui('API key required to run model nodes');
+}
+async function settings() {
+  modelSettings = await api('/api/settings');
+  $('model').value = modelSettings.model;
+  renderModelSettings();
+  const found=modelSettings.cli_deciders || {};
+  for (const name of ['claude','codex']) $('decider').querySelector('option[value='+name+']').disabled=!found[name];
+  if (!deciderTouched) $('decider').value=found.claude ? 'claude' : found.codex ? 'codex' : 'openai';
+  renderDeciderNote();
+}
+let deciderTouched=false;
+const cliTitles={claude:'Claude Code',codex:'Codex CLI'};
+function renderDeciderNote(){
+  const choice=$('decider').value, cli=cliTitles[choice];
+  $('decider-note').textContent=cli
+    ? (modelSettings?.cli_deciders?.[choice] ? 'Each decision runs a fresh local '+cli+' process with no tools; the independent review uses a different model than the designer. Decider identity is self-reported and unverified.'
+       : cli+' was not found. Install it and sign in, or set '+(choice==='claude'?'OPTICS_CLAUDE_BIN':'OPTICS_CODEX_BIN')+'.')
+    : (modelSettings?.key_configured ? 'Uses the API key saved in Model settings.' : 'Needs an API key in Model settings.');
+}
+$('decider').addEventListener('change',()=>{deciderTouched=true;renderDeciderNote();});
+const deciderRoles={interpret:'Interpreting the request',design:'Designing the layout',optical_tests:'Writing optical tests (fresh context)',
+  review:'Independent review (fresh context)',repair_act:'Choosing an angle repair',repair_controller:'Choosing a position repair'};
+function deciderText(d){
+  if (!d) return '';
+  const who=d.title || 'Local CLI';
+  if (d.state==='thinking') return who+' · '+(deciderRoles[d.role] || d.role)+(d.model?' · '+d.model:'')+(d.attempt>1?' · try '+d.attempt:'');
+  if (d.state==='rejected') return who+' · answer rejected, asking again: '+(d.last_errors || []).join('; ');
+  if (d.state==='error') return who+' stopped: '+(d.error || 'unknown error');
+  const models=d.models?' · design '+d.models.decisions+', review '+d.models.review:'';
+  if (d.state==='done') return who+' decisions · '+(d.decisions || 0)+' answered'+models;
+  return who+' decisions · '+(d.decisions || 0)+' answered so far'+models;
+}
+function renderDecider(s){
+  const d=s?.decider;
+  $('decider-status').hidden=!d;
+  $('decider-status').classList.toggle('error',d?.state==='error');
+  $('decider-text').textContent=deciderText(d);
+  $('decider-retry').hidden=d?.state!=='error';
+}
+$('decider-retry').onclick=async()=>{
+  try{await api('/api/runs/'+current+'/decider/retry',{});toast('Retrying with a fresh process');await refresh();}catch(e){toast(e.message)}
+};
+function selectRun(id) {
+  if (current === id) return;
+  current = id;
+  const selectedUrl=new URL(location.href);
+  selectedUrl.searchParams.set('run',id);
+  window.history.replaceState(null,'',selectedUrl);
+  lastState = null;
+  presentation = null;
+  presentationNextCheck = 0;
+  missingPresentationText.clear();
+  showTranslationStatus();
+  $('review-controls').style.display = 'none';
+  $('continue').style.display = 'none';
+  updatePlayback(null);
+  $('run-select').value=id;
+  document.querySelectorAll('[data-run]').forEach(button => button.setAttribute('aria-current', String(button.dataset.run === id)));
+}
+let historyRows;
+function renderHistory(rows) {
+  const key = JSON.stringify([language, rows.map(r => [r.run_id,r.status,r.display_state])]);
+  if ($('history').dataset.key !== key) {
+    $('history').dataset.key = key;
+    $('run-select').replaceChildren(new Option(ui("Choose a run"),''), ...rows.map(r=>
+      new Option(stateLabel(r)+' · '+new Date(r.created_at).toLocaleString(language)+' · '+r.run_id.slice(0,8),r.run_id)));
+    $('run-select').value=current || '';
+    $('history').innerHTML = rows.length ? rows.map(r =>
+      `<button data-run="${esc(r.run_id)}" aria-current="${r.run_id === current}">${esc(stateLabel(r))} · ${esc(r.mode)}<br><span class="muted">${esc(new Date(r.created_at).toLocaleString(language))} · ${esc(r.run_id.slice(0,8))}</span></button>`
+    ).join('') : ("<p class=\"muted\">"+ui("No runs yet")+"</p>");
+    document.querySelectorAll('[data-run]').forEach(button => button.onclick = () => {
+      selectRun(button.dataset.run);
+      refresh().catch(e => toast(e.message));
+    });
+  }
+}
+async function refreshHistory() {
+  const rows = await api('/api/runs');
+  historyRows = rows;
+  renderHistory(rows);
+  if (!current && rows.length) {
+    const requested = new URLSearchParams(location.search).get('run');
+    const selected=rows.find(r=>r.run_id===requested) || rows.find(r=>r.simulation_backend==='algorithm_v1') ||
+      rows.find(r=>['algorithm_passed','pause_requested','stop_requested','paused','stopped'].includes(r.status));
+    if (selected) {
+      selectRun(selected.run_id);
+      await refresh();
+    }
+  }
+}
+
+$('run-select').onchange=()=>{
+  const id=$('run-select').value;
+  if (id) {selectRun(id);refresh().catch(e=>toast(e.message))}
+  else $('run-select').value=current || '';
+};
+function expectedNext(s, node, team) {
+  if (!s.active && s.status === 'awaiting_review') return {label:ui("Waiting for review decision")};
+  if (!s.active && s.status==='paused') return {label:s.next_node?ui("On resume: ")+(algorithmNames[s.next_node] || s.next_node):ui("Waiting to resume")};
+  if (!s.active && s.status !== 'queued') return {};
+  if (s.next_node && s.next_node !== node) return {node:s.next_node, exact:true};
+  if (s.stage === 'feedback_router' && s.return_to && (!node || node === 'feedback_router')) {
+    return {node:s.return_to, exact:true};
+  }
+  if (!node) return s.status === 'queued' ? {node:team ? 'input' : 'context', exact:true} : {};
+  if (node === 'input') return {node:s.team_entry === 'nl' || (isPrecisionRun(s) && !usesSameTable(s)) ? 'prompt' : 'vision'};
+  if (isPrecisionRun(s)) {
+    const retained=usesSameTable(s);
+    if (node==='prompt') return {node:retained?'act':'precision_sim'};
+    if (node==='precision_vision_agent' && s.precision_pending_assessment) return {node:'precision_reobserve'};
+    if (agentNodes.includes(node)) return {node:retained?'controller':'precision_sim'};
+    if (node==='controller' && retained) return {node:s.precision_pending?'precision_repair':'precision_sim'};
+    if (node==='precision_output' && retained && s.mode==='github_local') return {node:'mode'};
+    if (node==='precision_reobserve') return {node:'precision_output'};
+  }
+  if (node === 'mode') return {node:s.mode === 'github_sim' ? 'done' : s.require_review ? 'safety_gate' : 'execution', exact:true};
+  if (node === 'context') return {node:s.profile?.startsWith('legacy') ? 'legacy_backend' : 'interpret'};
+  if (node === 'output_validator') return {node:s.require_review ? 'review' : 'execution_gate'};
+  if (node === 'feedback_router' || node === 'diagnose_simulation') return {label:ui("Waiting for route decision")};
+  return {node:(team ? teamNext : phaseNext)[node]};
+}
+
+const emptyFlow={mode:'github_local',profile:'auto',simulation_backend:'algorithm_v1'};
+const algorithmNames=localizedLabels({input:"Input",vision:"Vision · Workbench observations",prompt:"Prompt · Requirements",act:"Act · Layout",validator:"Validator · Review and tests",
+  controller:"Controller · Plan",sim:"Sim · Algorithm simulation",output:"Output · Acceptance",mode:"Mode · Handoff",execution:"Execution · Simulated receipt",
+  done:"Done",failed:"Failed · Stopped",feedback_router:"Feedback router"});
+const definitionKey=(team,algorithm)=>algorithm?'algorithm':team;
+const graphDefinitions=new Map();
+const starts='__start__', ends='__end__';
+const graphNames=localizedLabels({
+  [starts]:"Start",[ends]:"End",input:"Input and scene",vision:"Vision localization / PROB0",
+  prompt:"Requirements / Prompt",act:"Optical layout / Act",validator:"Design review and tests",controller:"Trajectory planning",
+  sim:"MuJoCo / Isaac simulation",output:"Artifact and optical acceptance",mode:"Handoff mode",safety_gate:"Safety review",
+  execution:"ROSi → L1 handoff",precision_sim:"RGB localization and robot simulation",precision_repair:"Single-component correction on the same table",precision_output:"Mechanical and optical recheck",
+  precision_reobserve:"Same-table camera recheck",
+});
+const reasonNames=localizedLabels({retry_allowed:"Retry via feedback",target_retry_limit:"Node retry budget exhausted",
+  total_retry_limit:"Total retry budget exhausted",route_not_allowed:"No eligible correction route"});
+const phaseNames=localizedLabels({assembly:"RGB localization and pick-and-place",final_camera_check:"Camera recheck for each component",
+  mechanical_stage_completed:"Optical alignment",feedback_stage_completed:"Independent optical recheck",
+  completed:"Simulation complete",failed:"Simulation stopped",completed_with_quality_failure:"Acceptance failed"});
+const motionNames=localizedLabels({pregrasp:"Move to pregrasp",approach:"Approach component",close:"Grip",
+  'yaw at support':"Rotate on table support",lift:"Lift",route:"Clear neighboring components",transfer:"Transfer",
+  'visual hover':"Align before lowering",lower:"Lower",release:"Release",retreat:"Retreat",
+  'lift clear':"Lift gripper clear"});
+let graphRun, graphState=emptyFlow, graphNode=null, graphRound=null, graphFull=false;
+const measuredProgress=s=>Number.isInteger(s.precision_progress?.required)?s.precision_progress:null;
+const liveRepairTargets=s=>s.live_node==='precision_repair'
+  ? s.precision_repairs?.findLast(row=>row.failed_attempt===precisionAttempt(s)-1)?.target_object_ids || [] : [];
+function precisionPhaseText(s,progress) {
+  if (progress.motion_phase) {
+    const {object_id,phase,rehearsal}=progress.motion_phase;
+    return (rehearsal?ui("MuJoCo rehearsal copy"):ui("MuJoCo execution"))+' · '+object_id+' · '+(motionNames[phase] || phase);
+  }
+  const targets=liveRepairTargets(s);
+  if (progress.phase==='assembly' && targets.length) return ui("Single-component pick-and-place and recheck · ")+targets.join(language==='en'?', ':'、');
+  return (phaseNames[progress.phase] || progress.phase)+' · '+progress.completed+'/'+progress.required+ui(" components");
+}
+function replaceContent(id,content) {
+  const el=$(id);
+  if (el._content===content) return;
+  const key=document.activeElement?.getAttribute('data-map-node') ?? document.activeElement?.getAttribute('data-round') ??
+    document.activeElement?.getAttribute('data-pose-group');
+  const restore=key!==null && key!==undefined && el.contains(document.activeElement);
+  const open=new Set([...el.querySelectorAll('details[open][data-entry]')].map(item=>item.dataset.entry));
+  el._content=content;
+  el.innerHTML=content;
+  if (open.size) el.querySelectorAll('details[data-entry]').forEach(item=>{item.open=open.has(item.dataset.entry)});
+  if (restore) [...el.querySelectorAll('[data-map-node],[data-round],[data-pose-group]')].find(item=>
+    (item.dataset.mapNode ?? item.dataset.round ?? item.dataset.poseGroup)===key)?.focus({preventScroll:true});
+}
+const linkKey=(from,to)=>from+'>'+to;
+const toNode=row=>row.to==='stop'?'failed':row.to;
+function journalFor(s, precise) {
+  const rounds=[];
+  const add=(key,title)=>{const round={key,title,events:[],routes:[],repairs:[]};rounds.push(round);return round};
+  let round=add(precise?'setup':'1',precise?ui("Input and setup"):ui("Round 1"));
+  let newRound=false, previous=null;
+  const routeRounds=new Map();
+  const seenRepairs=new Set();
+  for (const [index,event] of (s.events || []).entries()) {
+    const from=previous?.stage, to=event.stage;
+    if (!s.mode.startsWith('github_') &&
+        ((from==='layout_validator' && to==='optics_agent') ||
+         (from==='plan_validator' && to==='coding_agent') ||
+         (from==='diagnose_simulation' && ['optics_agent','coding_agent','simulate'].includes(to)))) {
+      round.routes.push({from,to,code:previous.message,time:event.time,direct:true});
+      newRound=true;
+    }
+    previous=event;
+    if (precise && precisionExecutions.has(event.stage) && precisionAttempt(s,event) &&
+        round.key!==String(precisionAttempt(s,event))) {
+      const attempt=precisionAttempt(s,event);
+      const existing=rounds.find(r=>r.key===String(attempt));
+      round=existing || add(String(attempt),ui("Round ")+attempt+ui(""));
+    } else if (!precise && newRound && !event.route) {
+      round=add(String(rounds.length+1),ui("Round ")+(rounds.length+1)+ui(""));
+      newRound=false;
+    }
+    round.events.push({...event,index});
+    if (event.route) {
+      routeRounds.set(event.route.time,round);
+      round.routes.push(event.route);
+      newRound=event.route.to!=='stop';
+    }
+    const repair=(s.precision_repairs || []).find(r=>r.agent===event.stage && String(r.failed_attempt)===round.key);
+    if (repair && !seenRepairs.has(repair)) {round.repairs.push(repair);seenRepairs.add(repair)}
+  }
+  // Some historical snapshots only kept the feedback/repair arrays.
+  for (const row of s.retry_log || []) if (!routeRounds.has(row.time)) {
+    const key=String(row.attempt ?? 1);
+    const owner=(precise && row.from==='precision_output'
+      ? rounds.find(r=>r.key===key) || add(key,ui("Round ")+key+ui("")) : round);
+    owner.routes.push(row);
+  }
+  for (const repair of s.precision_repairs || []) if (!seenRepairs.has(repair)) {
+    const key=String(repair.failed_attempt);
+    (rounds.find(r=>r.key===key) || add(key,ui("Round ")+key+ui(""))).repairs.push(repair);
+  }
+  const livePrecision=precise && s.active && precisionExecutions.has(s.live_node) && precisionAttempt(s);
+  if (livePrecision) {
+    const key=String(livePrecision);
+    if (!rounds.some(r=>r.key===key)) add(key,ui("Round ")+key+ui(""));
+  }
+  return rounds.filter(r=>r.events.length || r.routes.length || r.repairs.length ||
+    (livePrecision && r.key===String(livePrecision)));
+}
+
+function mapLanes(team,precise,full,retained,algorithm) {
+  if (algorithm) return [
+    [ui("Experiment requirements, observations, and design"),[starts,'input','vision','prompt','act','validator']],
+    [ui("Planning, algorithm execution, and acceptance"),['execution','mode','output','sim','controller']],
+    [ui("Exits, optional review, and retries"),[ends,'done','failed','safety_gate','feedback_router','rejected']],
+  ];
+  if (!team) return [
+    [ui("Requirements and design"),[starts,'context','interpret','optics_agent','layout_validator','coding_agent']],
+    [ui("Compilation, simulation, and acceptance"),['finalize','execution_gate','review','output_validator','simulate','plan_validator']],
+    [ui("Branches and exit"),[ends,'legacy_backend','exhausted','diagnose_simulation']],
+  ];
+  const normal=['input','vision','prompt','act','validator','controller'];
+  const execute=['done','execution','safety_gate','mode','output','sim'];
+  if (full) return [
+    [ui("Requirements, vision, and trajectory planning"),normal],
+    [ui("Standard simulation and ROSi handoff"),execute],
+    [ui("Precision robot simulation and workflow control"),[starts,'precision_sim','precision_repair','precision_output','feedback_router','failed']],
+    [ui("Correction agents and review exit"),[...agentNodes,'rejected',ends]],
+    [ui("Retry observation on the same table"),[null,null,'precision_reobserve']],
+  ];
+  if (precise && retained) return [
+    [ui("Input, camera localization, and trajectory planning"),normal],
+    [ui("Same-table execution and independent acceptance"),[null,null,'precision_output','precision_repair','precision_sim']],
+    [ui("Handoff and exit after acceptance"),['done','execution','safety_gate','mode','rejected',ends]],
+    [ui("Read-only recheck, feedback routing, and stop"),[null,'precision_reobserve','feedback_router','failed']],
+    [ui("Correction agents · Replan at Controller"),[...agentNodes]],
+  ];
+  if (precise) return [
+    [ui("Main execution path"),[starts,'input','prompt','precision_sim','precision_output','done']],
+    [ui("Feedback routing and exit"),[null,null,null,null,'feedback_router','failed']],
+    [ui("Repeat simulation after correction"),[null,...agentNodes,ends]],
+  ];
+  return [
+    [ui("Requirements, vision, and trajectory planning"),normal],
+    [ui("Simulation, acceptance, and ROSi handoff"),execute],
+    [ui("Workflow control and exits"),[starts,null,'rejected','feedback_router','failed',ends]],
+  ];
+}
+function pathBetween(a,b,edgeType,index) {
+  const [x,y]=a,[xx,yy]=b;
+  if (y===yy && Math.abs(xx-x)<200) {
+    const d=Math.sign(xx-x);
+    return `M${x+74*d} ${y}H${xx-79*d}`;
+  }
+  if (y===yy) {
+    const above=y>95 && edgeType==='branch';
+    const d=above?-1:1, lane=y+d*(38+index%4*5);
+    return `M${x} ${y+27*d}V${lane}H${xx}V${yy+32*d}`;
+  }
+  const d=Math.sign(yy-y), offset=edgeType==='branch' ? index%7*4-12 : 0;
+  const sx=x+offset, ex=xx+offset;
+  if (Math.abs(yy-y)>140) {
+    // Keep long return paths out of the intervening lane's node boxes.
+    const gutter=Math.max(9, Math.min(1051, x+(xx>=x?85:-85)));
+    return `M${sx} ${y+27*d}V${y+44*d}H${gutter}V${yy-42*d}H${ex}V${yy-32*d}`;
+  }
+  const mid=(y+yy)/2+offset;
+  return `M${sx} ${y+27*d}V${mid}H${ex}V${yy-32*d}`;
+}
+function renderMap(s,team,precise,name,rounds,selected,next,live) {
+  const retained=usesSameTable(s);
+  const algorithm=isAlgorithm(s);
+  const lanes=mapLanes(team,precise,graphFull,retained,algorithm);
+  const nodes=new Map();
+  const bands=lanes.map(([title,ids],row)=>{
+    ids.forEach((id,col)=>{if(id)nodes.set(id,[100+col*172,67+row*124])});
+    return `<rect class="map-lane" x="9" y="${10+row*124}" width="1042" height="94" rx="9"/>
+      <text class="map-lane-title" x="25" y="${31+row*124}">${esc(title)}</text>`;
+  }).join('');
+  const allEvents=s.events || [];
+  const events=selected?.events ?? allEvents;
+  const routes=selected?.routes ?? rounds.flatMap(r=>r.routes);
+  const trace=new Map();
+  const actual=(from,to,kind='visited')=>{
+    if (from && to && from!==to) trace.set(linkKey(from,to),[from,to,kind]);
+  };
+  const definition=[...(graphDefinitions.get(definitionKey(team,algorithm)) || [])];
+  if (precise && !retained) {
+    // The current definition may no longer contain the old direct execution edges.
+    const historical=[['prompt','precision_sim'],...agentNodes.map(node=>[node,'precision_sim'])];
+    for (const [from,to] of historical) {
+      if (!definition.some(edge=>edge[0]===from && edge[1]===to)) definition.push([from,to]);
+    }
+  }
+  const allowed=new Set(definition.map(([from,to])=>linkKey(from,to)));
+  const stepStyle=(from,to)=>agentNodes.includes(from) || to==='precision_repair'?'feedback':'visited';
+  let prev=selected && selected!==rounds[0] ? null : starts;
+  for (const e of events) {
+    if (e.route) {
+      actual(e.route.from,'feedback_router','feedback');
+      actual('feedback_router',toNode(e.route),'feedback');
+      prev=toNode(e.route);
+    } else {
+      if (allowed.has(linkKey(prev,e.stage))) actual(prev,e.stage,stepStyle(prev,e.stage));
+      prev=e.stage;
+    }
+  }
+  for (const r of routes) {
+    if (r.direct) {actual(r.from,r.to,'feedback');continue}
+    actual(r.from,'feedback_router','feedback');
+    actual('feedback_router',toNode(r),'feedback');
+  }
+  if (selected) {
+    const index=rounds.indexOf(selected);
+    const executionStart=round=>round?.events[0]?.stage ??
+      (round && s.active && round.key===String(precisionAttempt(s)) ? live : null);
+    const nextExecution=executionStart(rounds[index+1]);
+    if (precisionExecutions.has(nextExecution) && allowed.has(linkKey(prev,nextExecution))) {
+      actual(prev,nextExecution,stepStyle(prev,nextExecution));
+    }
+    const execution=executionStart(selected);
+    const prior=rounds[index-1]?.events.at(-1)?.stage;
+    if (precisionExecutions.has(execution) && allowed.has(linkKey(prior,execution))) {
+      actual(prior,execution,stepStyle(prior,execution));
+    }
+  }
+  const currentRound=selected===rounds.at(-1) || !selected;
+  if (precise && retained && currentRound && allEvents.some(e=>e.stage==='precision_output' && e.outcome==='passed')) {
+    const handoff=allEvents.some(e=>e.stage==='execution') || live==='execution';
+    const gate=live==='safety_gate' || s.status==='awaiting_review' || s.status==='rejected' || s.approved;
+    if (handoff || gate || live==='mode') actual('precision_output','mode');
+    if (gate) actual('mode','safety_gate');
+    if (handoff) actual(gate?'safety_gate':'mode','execution');
+  }
+  if (currentRound && s.active && live && allowed.has(linkKey(prev,live))) {
+    actual(prev,live,stepStyle(prev,live));
+  }
+  const isTerminal=s.stage==='done' || s.stage==='failed' || s.status==='rejected' ||
+    (!team && s.stage==='finalize');
+  const terminal=s.status==='rejected'?'rejected':s.stage;
+  if (currentRound && isTerminal && !s.active) {
+    if (allowed.has(linkKey(prev,terminal))) actual(prev,terminal);
+    if (!algorithm && terminal==='done' && allEvents.some(e=>e.stage==='output' && e.outcome==='passed') && !precise) {
+      actual('output','mode');
+      if (s.mode==='github_sim') actual('mode','done');
+      else if (s.require_review && s.approved) {actual('mode','safety_gate');actual('safety_gate','execution')}
+      else if (!s.require_review && s.status==='team_l1_passed') actual('mode','execution');
+    }
+    if (allowed.has(linkKey(terminal,ends))) actual(terminal,ends);
+  }
+  if (currentRound && live && next.node && !trace.has(linkKey(live,next.node)) && allowed.has(linkKey(live,next.node))) {
+    actual(live,next.node,'next');
+  }
+  const colors={branch:'#536479',visited:'#8bd2b9',feedback:'#d5aa66',next:'#a2bbd1'};
+  const defs='<defs>'+Object.entries(colors).map(([k,v])=>
+    `<marker id="map-arrow-${k}" markerWidth="7" markerHeight="7" refX="6" refY="3.5" orient="auto"><path d="M0 0L7 3.5 0 7Z" fill="${v}"/></marker>`).join('')+'</defs>';
+  const edges=[...definition.filter(([f,t])=>!trace.has(linkKey(f,t))).map(([f,t])=>[f,t,'branch']),...trace.values()]
+    .filter(([f,t])=>nodes.has(f)&&nodes.has(t))
+    .map(([f,t,k],i)=>`<path class="map-edge ${k}" data-from="${esc(f)}" data-to="${esc(t)}" stroke="${colors[k]}" marker-end="url(#map-arrow-${k})" d="${pathBetween(nodes.get(f),nodes.get(t),k,i)}"/>`).join('');
+  const last=new Map(events.map(e=>[e.stage,e]));
+  const edgeNodes=new Set([...trace.values()].filter(e=>e[2]!=='next').flatMap(e=>e.slice(0,2)));
+  const targets=new Set(routes.map(toNode));
+  const mapName=(label)=>{
+    const lines=[''];
+    for (const word of label.split(' ')) {
+      const index=lines.length-1;
+      const next=[lines[index],word].filter(Boolean).join(' ');
+      if (lines[index] && next.length>23) lines.push(word);
+      else lines[index]=next;
+    }
+    return lines.length===1 ? '<text y="-4" text-anchor="middle">'+esc(label)+'</text>' :
+      '<text text-anchor="middle" style="font-size:10px">'+lines.slice(0,3).map((line,index)=>
+        '<tspan x="0" y="'+(-16+index*10)+'">'+esc(line)+'</tspan>').join('')+'</text>';
+  };
+  const cards=[...nodes].map(([id,[x,y]])=>{
+    const e=last.get(id);
+    const [style,status]=id===live && currentRound?['current',s.active?ui("Executing"):ui("Pending review")]:
+      id===next.node && currentRound && !e?['next',next.exact?ui("Next step"):ui("Expected next step")]:
+      id==='feedback_router' && routes.length?['feedback',routes.length+ui(" feedback events")]:
+      e?.outcome==='failed' || (id==='failed' && edgeNodes.has(id))?['failed',ui("Failed / stopped")]:
+      e?.outcome==='passed' || (id===terminal && isTerminal && currentRound)?['passed',ui("Passed")]:
+      e || (edgeNodes.has(id) && !targets.has(id))?['passed',ui("Recorded")]:
+      targets.has(id)?['feedback',ui("Routed")]:['',ui("Not visited")];
+    return `<g class="map-node ${style}${graphNode===id?' selected':''}" data-map-node="${esc(id)}"
+      role="button" tabindex="0" aria-label="${esc(name(id)+' · '+status)}" aria-pressed="${graphNode===id}"
+      transform="translate(${x} ${y})"><title>${esc(id+' · '+status)}</title>
+      <rect x="-74" y="-27" width="148" height="54" rx="8"/>
+      ${mapName(name(id))}
+      <text class="map-state" y="15" text-anchor="middle">${esc(status)}</text></g>`;
+  }).join('');
+  $('node-map').setAttribute('viewBox','0 0 1060 '+(lanes.length*124-8));
+  replaceContent('node-map',defs+bands+edges+cards);
+  const relevant=events.filter(e=>e.stage===graphNode);
+  const outgoing=definition.filter(([f])=>f===graphNode).map(([,t])=>name(t));
+  const descriptions={
+    precision_sim:ui("RGB localization → grasp and path planning → pick-and-place → camera recheck → optical alignment"),
+    precision_repair:ui("Load previous physical state → correct selected component → recheck the full table"),
+    precision_reobserve:ui("Capture again from the verified open-gripper checkpoint. The recheck has read-only access."),
+  };
+  const sub=precise && descriptions[graphNode] ? ' · '+descriptions[graphNode] : '';
+  const nodeText=graphNode ? name(graphNode)+' · '+graphNode+sub+' · '+relevant.length+ui(" node records")+
+    (outgoing.length?ui(" · Allowed routes: ")+outgoing.join(language==='en'?', ':'、'):'') :
+    ui("Select a node to find its log. Select a round to see its recorded path. Gray dashes indicate allowed branches.");
+  if ($('graph-inspector').textContent!==nodeText) $('graph-inspector').textContent=nodeText;
+}
+
+function precisionEvidence(s,round) {
+  const measured=s.precision_attempt_evidence?.[round.key];
+  const output=round.events.findLast(event=>event.stage==='precision_output');
+  const repair=round.events.findLast(event=>event.stage==='precision_repair');
+  const latestAttempt=s.precision_attempt_dirs?.length || s.attempts?.precision_sim;
+  const isLatest=String(latestAttempt)===round.key;
+  const final=isLatest ? s.verification || s.precision_result?.verification : null;
+  return {
+    recovery:measured?.recovery ?? output?.recovery ?? repair?.recovery ??
+      (isLatest ? s.verification?.recovery ?? s.precision_result?.recovery : null),
+    checks:measured?.checks ?? output?.checks ?? final,
+    diagnostic:measured?.diagnostic===true,
+    diagnosticObjects:measured?.diagnostic_objects,
+  };
+}
+function repairReadout(recovery,checks,diagnostic,diagnosticObjects) {
+  const names=ids=>Array.isArray(ids) && ids.length ? ids.join(language==='en'?', ':'、') : ui("None");
+  const state=value=>value===true || value==='passed' || value?.passed===true?ui("Passed"):
+    value===false || value==='failed' || value?.passed===false?ui("Failed"):ui("Awaiting recheck");
+  const targets=recovery.target_object_ids;
+  const commanded=recovery.commanded_object_ids;
+  const others=Array.isArray(targets) && Array.isArray(commanded)
+    ? new Set(commanded.filter(id=>!targets.includes(id))).size : null;
+  const retained=recovery.retained_scene===true?ui("Restored from the recorded table"):recovery.retained_scene===false?ui("Table retention check failed"):ui("Awaiting validation");
+  const untouched=Array.isArray(recovery.untouched_object_ids) ? ui(" · Components without move authorization: ")+recovery.untouched_object_ids.length+ui(" components") : '';
+  const details=(recovery.attempts || []).flatMap(row=>{
+    const gap=row.clearance?.command_gap_m;
+    const offset=row.grasp_plan?.lift_offset_xy_m;
+    const residual=row.position_residual_m;
+    return [Array.isArray(offset)?ui("Lateral lift offset ")+Math.hypot(...offset).toFixed(4)+' m':'',
+      Number.isFinite(gap)?ui("Expected placement gap ")+(1000*gap).toFixed(3)+' mm':'',
+      Number.isFinite(residual)?ui("Camera placement error ")+(1000*residual).toFixed(3)+' mm':''].filter(Boolean);
+  });
+  return '<p>'+esc(ui("Target components: ")+names(targets)+ui(" · Motion commanded: ")+names(commanded))+'</p>'+
+    '<p>'+esc(retained+untouched+(others!==null?ui(" · Non-target components commanded to move: ")+others+ui(" components"):''))+'</p>'+
+    (details.length?'<p>'+esc(details.join(' · '))+'</p>':'')+
+    '<p>'+esc(ui("Independent mechanical recheck: ")+state(checks?.mechanical)+' · '+
+      (diagnostic?ui("Final-state optical diagnosis: "):ui("Independent optical recheck: "))+state(checks?.optical)+
+      (diagnostic && checks?.sensor_feedback===false?ui(" · Optical alignment not entered"):''))+'</p>'+
+    Object.entries(diagnosticObjects || {}).map(([name,row])=>'<p>'+esc(name+' · '+
+      (row.position_error_m*1000).toFixed(3)+' mm · '+(row.rotation_error_rad*180/Math.PI).toFixed(3)+'° · '+state(row))+'</p>').join('');
+}
+
+const previewFiles=new Set(['agent-prompt.txt','test-agent-prompt.txt','model-response.json','test-model-response.json','prompt.txt','prompt.json']);
+const artifactDialog=$('artifact-preview');
+let previewArtifact=null;
+let previewTimer=0;
+function openArtifactPreview(button) {
+  const [run,stage,attempt,file]=JSON.parse(button.dataset.artifactPreview);
+  const path=[stage,attempt,file].map(encodeURIComponent).join('/');
+  const base='/api/runs/'+encodeURIComponent(run);
+  previewArtifact={request:base+'/presentation/artifacts/'+path+'?language=en',original:base+'/algorithm/artifacts/'+path,file};
+  $('artifact-preview-title').textContent=(file.includes('response')?ui('View English response'):ui('View English prompt'))+' · '+file;
+  $('artifact-original').href=previewArtifact.original;
+  artifactDialog.showModal();
+  void readArtifactPreview();
+}
+async function readArtifactPreview(retry=false) {
+  clearTimeout(previewTimer);
+  const active=previewArtifact;
+  if (!active || !artifactDialog.open) return;
+  const content=$('artifact-content'),status=$('artifact-status'),retryButton=$('artifact-retry');
+  status.textContent=ui('Preparing English translation…');
+  retryButton.hidden=true;
+  content.hidden=true;
+  content.textContent='';
+  try {
+    const response=await api(active.request+(retry?'&retry=true':''));
+    if (active!==previewArtifact || !artifactDialog.open) return;
+    if (response.status==='translating') {
+      previewTimer=setTimeout(readArtifactPreview,2800);
+      return;
+    }
+    if (response.status!=='ready' || typeof response.content!=='string' || hasHan(response.content)) throw Error();
+    content.textContent=response.content;
+    content.hidden=false;
+    status.textContent=response.prompt_language_override?ui('English prompt version: output-language instruction adapted. Download preserves the original prompt.'):'';
+  } catch {
+    if (active!==previewArtifact || !artifactDialog.open) return;
+    status.textContent=ui('English translation is unavailable.');
+    retryButton.hidden=false;
+  }
+}
+$('artifact-retry').onclick=()=>{void readArtifactPreview(true)};
+artifactDialog.addEventListener('close',()=>{clearTimeout(previewTimer);previewArtifact=null});
+$('trace-events').addEventListener('click',event=>{
+  const button=event.target.closest('[data-artifact-preview]');
+  if (button) openArtifactPreview(button);
+});
+function algorithmEvent(s,e) {
+  if (!isAlgorithm(s) || !e.attempt) return '';
+  const allowed=['input.json','event.json','completion.json','decision.json','plan.json','artifact.zip',
+    'experiment.json','verification.json','simulation.json','prob0.json','target_layout.json','prompt.txt','prompt.json','validation.json','execution_receipt.json','requirements.json','design.json','design-review.json','model-response.json','agent-prompt.txt',
+    'optical-test-suite.json','optical-test-report.json','test-agent-prompt.txt','test-model-response.json','optical-test-observed.json'];
+  const base='/api/runs/'+encodeURIComponent(s.run_id)+'/algorithm/artifacts/'+encodeURIComponent(e.stage)+'/'+encodeURIComponent(e.attempt)+'/';
+  const files=new Set([...allowed.slice(0,3),...(Array.isArray(e.evidence)?e.evidence:[])]);
+  const decision=e.decision || s.algorithm_decisions?.find(d=>d.node===e.stage && d.attempt===e.attempt);
+  if (decision) files.add('decision.json');
+  const targets=decision?.target_object_ids || [];
+  const targetSummary=targets.length>3
+    ? targets.length+ui(' components')
+    : targets.join(language==='en'?', ':'、');
+  const info=(title,value)=>value===undefined || value===null?'':'<h3>'+title+'</h3><pre>'+esc(displayJson(value))+'</pre>';
+  const decisionText=decision?'<p>'+esc((decision.source==='rule_policy_v1'?ui("Historical local policy decision"):decision.source==='openai'?(decision.model || 'OpenAI')+ui(" decision"):decision.source || ui("Decision"))+
+    ' · '+(decision.action==='generate_and_run_tests'?ui('Generate and run tests'):decision.action || '')+
+    (targetSummary?ui(" · Target ")+targetSummary:''))+'</p>':'';
+  return decisionText+'<details data-entry="algorithm-'+e.index+("\"><summary>"+ui("Input, output, and evidence")+"</summary>")+
+    info(ui("Node input"),e.input_summary)+info(ui("Node output"),e.output_summary)+info(ui("Node decision"),decision)+
+    '<ul>'+allowed.filter(f=>files.has(f)).map(file=>{
+      const preview=language==='en' && previewFiles.has(file)
+        ? ' <button class="secondary" type="button" data-artifact-preview="'+esc(JSON.stringify([s.run_id,e.stage,e.attempt,file]))+'">'+
+          ui(file.includes('response')?'View English response':'View English prompt')+'</button>' : '';
+      return '<li><a href="'+base+file+'" download aria-label="'+esc(ui('Download original evidence')+' · '+file)+'">'+file+'</a>'+preview+'</li>';
+    }).join('')+'</ul></details>';
+}
+function renderTrace(s,rounds,selected,name,precise) {
+  const decisionCount=selected && (isAlgorithm(s) ? selected.events.filter(e=>e.decision ||
+    s.algorithm_decisions?.some(d=>d.node===e.stage && d.attempt===e.attempt)).length : selected.repairs.length);
+  const summary=selected ? [selected.title,selected.events.length+ui(" node records"),selected.routes.length+ui(" feedback events"),
+    decisionCount+(isAlgorithm(s)?ui(" node decisions"):ui(" correction decisions"))].join(' · ') : rounds.length ?
+    rounds.filter(r=>r.key!=='setup').length+ui(" rounds · ")+rounds.reduce((n,r)=>n+r.routes.length,0)+ui(" feedback events · View by round") :
+    ui("Node outputs and retries appear here after the run starts.");
+  $('trace-summary').textContent=summary;
+  const tab=(key,title)=>`<button class="secondary" type="button" data-round="${key}" aria-pressed="${(selected?.key ?? '')===key}">${esc(title)}</button>`;
+  replaceContent('trace-rounds',rounds.length ? tab('',ui("All rounds"))+rounds.map(r=>tab(r.key,r.title)).join('') : '');
+  const time=t=>t ? new Date(t).toLocaleString(language,{hour12:false}) : '';
+  const raw=(key,value)=>value===undefined || value===null?'':`<details data-entry="${esc(key)}"><summary>${ui("Raw record")}</summary><pre>${esc(displayJson(value))}</pre></details>`;
+  const item=(node,outcome,title,meta,body)=>`<li data-outcome="${outcome}" data-trace-node="${esc(node)}"><div class="trace-meta">
+    <strong>${esc(title)}</strong><span>${esc(meta)}</span></div>${body}</li>`;
+  const route=(r,key,extra='')=>item(r.direct?r.from:'feedback_router','feedback',ui("Feedback · ")+name(r.from)+' → '+name(toNode(r)),
+    [time(r.time),r.code].filter(Boolean).join(' · '),
+    '<p>'+esc([reasonNames[r.reason] || r.reason,
+      r.total_retries!==undefined?ui("Total retries ")+r.total_retries+' / '+r.total_limit:null,
+      r.to!=='stop' && r.retry_counts?.[r.retry_key || r.to]!==undefined?ui("Node retries ")+r.retry_counts[r.retry_key || r.to]+' / '+r.retry_limit:null
+    ].filter(Boolean).join(' · '))+'</p>'+extra+raw(key,r));
+  const repair=(r,key)=>item(r.agent,'feedback',ui("Correction decision · ")+name(r.agent),
+    [r.action,r.provider==='replay'?ui("Replayed decision"):r.model || r.provider,r.failure_code].filter(Boolean).join(' · '),
+    '<p>'+esc(r.diagnosis)+(r.target_object_ids?.length?ui(" · Correction target ")+esc(r.target_object_ids.join(language==='en'?', ':'、')):
+      r.observation_object_id?ui(" · Close-range read-only recheck ")+esc(r.observation_object_id):
+      r.guard_parts?.length?ui(" · Components to recheck ")+esc(r.guard_parts.join(language==='en'?', ':'、')):'')+
+      (r.independent_mechanical_residual?ui(" · Independent mechanical ")+esc(r.independent_mechanical_residual.position_mm.toFixed(3))+
+        ' mm / '+esc(r.independent_mechanical_residual.rotation_deg.toFixed(3))+'°':'')+'</p>'+raw(key,r));
+  const assessmentText=a=>{
+    const findings=Object.entries(a?.findings || {});
+    const drift=findings.filter(([,v])=>!v.passed).map(([id,v])=>
+      id+' '+(1000*v.position_m).toFixed(3)+' mm / '+v.rotation_deg.toFixed(3)+'°');
+    const excluded=Object.keys(a?.excluded || {});
+    const close=Object.entries(a?.close_pairs || {});
+    if (close.length) return '<p>'+esc(close.map(([pair,v])=>pair.replace(':','–')+' '+v.wrist_views+ui(" close-range captures in the same frame")).join(' · ')+
+      ui(" · Components authorized for grasp: 0"))+'</p>';
+    return findings.length?'<p>'+esc((a.near_object?ui("Close-range recheck ")+a.near_object+' · ':'')+ui("Checked ")+findings.length+ui(" camera records")+
+      (drift.length?ui(" · Out of tolerance: ")+drift.join(language==='en'?', ':'、'):ui(" · All observed components within tolerance"))+
+      (excluded.length?ui(" · Insufficient evidence: ")+excluded.join(language==='en'?', ':'、'):'')+
+      (a.observation_run_id?ui(" · Reused original camera records from the same checkpoint"):''))+'</p>':'';
+  };
+  const message=e=>{
+    const full=eventMessage(e);
+    if (!full) return '';
+    if (full.length<=160) return '<p>'+esc(full)+'</p>';
+    return '<details data-entry="message-'+e.index+'"><summary>'+esc(full.slice(0,157))+'…</summary><p>'+esc(full)+'</p></details>';
+  };
+  const event=(e)=>e.route?route(e.route,'route-'+e.index,algorithmEvent(s,e)):
+    item(e.stage,e.outcome==='failed'?'failed':e.outcome==='passed'?'passed':'other',name(e.stage),
+      [e.simulation_attempt?ui("Simulation round ")+e.simulation_attempt+ui(""):e.attempt?ui("Node attempt ")+e.attempt+ui(""):null,
+        e.imported_checkpoint?ui("Original table checkpoint loaded"):null,e.outcome==='failed'?ui("Failed"):e.outcome==='passed'?ui("Passed"):null,time(e.time)].filter(Boolean).join(' · '),
+      message(e)+assessmentText(e.assessment)+algorithmEvent(s,e)+raw('event-'+e.index,e.error || e.assessment));
+  const renderRound=r=>{
+    const shown=new Set();
+    const eventRoutes=new Set(r.events.filter(e=>e.route).map(e=>e.route.time));
+    let rows=r.events.map(e=>{
+      const i=r.repairs.findIndex((v,index)=>v.agent===e.stage && !shown.has(index));
+      if (i<0) return event(e);
+      shown.add(i);
+      return event(e)+repair(r.repairs[i],'repair-'+r.key+'-'+i);
+    }).join('');
+    rows+=r.routes.filter(v=>!eventRoutes.has(v.time)).map((v,i)=>route(v,'old-route-'+r.key+'-'+i)).join('');
+    rows+=r.repairs.map((v,i)=>shown.has(i)?'':repair(v,'repair-'+r.key+'-'+i)).join('');
+    const evidence=precise && precisionEvidence(s,r);
+    if (evidence?.recovery) {
+      rows+=item('precision_repair','other',ui("Same-table correction evidence"),'',
+        repairReadout(evidence.recovery,evidence.checks,evidence.diagnostic,evidence.diagnosticObjects)+raw('recovery-'+r.key,evidence.recovery));
+    }
+    const hasReport=precise && /^\d+$/.test(r.key) && s.precision_attempt_artifacts &&
+      (r.events.some(e=>e.stage==='precision_output') ||
+       (precisionExecutions.has(s.live_node) && precisionAttempt(s)===Number(r.key) && s.precision_artifacts?.includes('report')));
+    const report=hasReport?`<p><a download href="/api/runs/${encodeURIComponent(s.run_id)}/precision/report?attempt=${r.key}${" target=\"_blank\" rel=\"noopener\">Open simulation report for this round"}</a></p>`:'';
+    return item('','other',r.title,'',report)+rows;
+  };
+  const runRows=(selected?[selected]:rounds).map(renderRound).join('');
+  const latest=selected===rounds.at(-1) || !selected;
+  const progress=measuredProgress(s);
+  const liveTargets=liveRepairTargets(s);
+  const observing=s.live_node==='precision_reobserve'?s.live_observation:null;
+  const live=latest && s.active && s.live_node ? item(s.live_node,'other',ui("Executing · ")+name(s.live_node),
+    precisionExecutions.has(s.live_node) && precisionAttempt(s) ? ui("Simulation round ")+precisionAttempt(s)+ui("") :
+      s.live_attempt?ui("Node attempt ")+s.live_attempt+ui(""):'',
+    (liveTargets?.length?("<p>"+ui("Correction targets this round: "))+esc(liveTargets.join(language==='en'?', ':'、'))+'</p>':'')+
+    (observing?'<p>'+esc(ui("Captured and measured ")+observing.measured+'/'+observing.required+ui(" components · Read-only recheck in progress")+
+      (s.precision_pending_assessment?.near_object?ui(" · Close-range: ")+s.precision_pending_assessment.near_object:'')+
+      (observing.latest?ui(" · Latest: ")+observing.latest.object_id:''))+'</p>':'')+
+    (progress && precisionExecutions.has(s.live_node)?'<p>'+esc(precisionPhaseText(s,progress)+
+      (progress.failure?' · '+progress.failure:''))+'</p>':'')):'';
+  const finished=latest && !s.active && s.status && !['queued','running','interrupted','awaiting_review','awaiting_decision','pause_requested','paused','stop_requested'].includes(s.status)
+    ? item(s.stage,s.status==='failed'?'failed':'other',ui("Run outcome"),statuses[s.status] || s.status,''):'';
+  replaceContent('trace-events',runRows+live+finished);
+}
+function renderFlow(s) {
+  if (graphRun!==s.run_id) {
+    graphRun=s.run_id;
+    graphRound=graphNode=null;
+    $('trace-scroll').scrollTop=0;
+  }
+  graphState=s;
+  const team=isAlgorithm(s) || s.mode.startsWith('github_');
+  const precise=team && isPrecisionRun(s);
+  const name=id=>(isAlgorithm(s) && algorithmNames[id]) || graphNames[id] || (team?teamLabels:labels)[id] || id;
+  const live=s.active?s.live_node:s.status==='awaiting_review'?(team?'safety_gate':'review'):null;
+  const displayed=live || (s.stage==='queued'?null:s.stage);
+  const next=expectedNext(s,live,team);
+  const show=(id,value)=>{if($(id).textContent!==value)$(id).textContent=value};
+  const experimentTitle=s.algorithm_experiment?.title || s.algorithm_intent?.title;
+  replaceContent('graph-experiment',isAlgorithm(s) && experimentTitle?
+    '<details data-entry="design-summary"><summary>'+esc(experimentTitle)+(ui(" · View requirements, design, and tests")+"</summary>")+algorithmExperimentSummary(s)+'</details>':'');
+  const error=isAlgorithm(s) && s.error?.message;
+  $('graph-error').hidden=!error;
+  show('graph-error',error || '');
+  show('current-caption',live || !displayed?ui("Current node"):ui("Last completed node"));
+  const executingPrecision=s.active && precisionExecutions.has(live);
+  const phase=executingPrecision && measuredProgress(s);
+  const attempt=executingPrecision && precisionAttempt(s) ? ui(" · Attempt ")+precisionAttempt(s)+ui("") :
+    s.active && s.live_attempt?ui(" · Attempt ")+s.live_attempt+ui(""):'';
+  const current=displayed ? name(displayed)+attempt+
+    (phase?' · '+precisionPhaseText(s,phase):'') : ui("Waiting for input");
+  show('flow-current',current);
+  show('stage',current);
+  show('next-caption',next.node && !next.exact?ui("Expected next step"):ui("Next step"));
+  show('flow-next',next.node?name(next.node):next.label || '—');
+  $('graph-scope').hidden=!team || isAlgorithm(s);
+  $('graph-panel').classList.toggle('algorithm-panel',isAlgorithm(s));
+  show('graph-title',isAlgorithm(s)?ui("LangGraph node map · Algorithm workflow"):ui("LangGraph node map"));
+  const rounds=journalFor(s,precise);
+  const selected=rounds.find(r=>r.key===graphRound);
+  renderMap(s,team,precise,name,rounds,selected,next,live);
+  renderTrace(s,rounds,selected,name,precise);
+  if (isAlgorithm(s)) renderAlgorithm(s,rounds,selected);
+}
+function chooseMapNode(node) {
+  graphNode=node;
+  renderFlow(graphState);
+  const entry=[...$('trace-events').children].findLast(el=>el.dataset.traceNode===node && el.querySelector('details')) ||
+    [...$('trace-events').children].findLast(el=>el.dataset.traceNode===node);
+  if (entry) {
+    $('trace-scroll').scrollTop=entry.offsetTop-$('trace-events').offsetTop;
+    if (isAlgorithm(graphState)) {
+      (entry.querySelector('details[data-entry^="algorithm-"]') || entry.querySelector('details'))?.setAttribute('open','');
+      const panel=entry.closest('.graph-details');
+      if ($('graph-dialog').open && matchMedia('(min-width: 1000px)').matches) {
+        panel.scrollTop+=entry.getBoundingClientRect().top-panel.getBoundingClientRect().top-12;
+      }
+    }
+  }
+}
+$('node-map').addEventListener('click',event=>{
+  const node=event.target.closest('[data-map-node]');
+  if (node) chooseMapNode(node.dataset.mapNode);
+});
+$('node-map').addEventListener('keydown',event=>{
+  if (!['Enter',' '].includes(event.key) || !event.target.dataset.mapNode) return;
+  event.preventDefault();
+  chooseMapNode(event.target.dataset.mapNode);
+});
+$('trace-rounds').onclick=event=>{
+  const tab=event.target.closest('[data-round]');
+  if (!tab) return;
+  graphRound=tab.dataset.round || null;
+  renderFlow(graphState);
+  $('trace-scroll').scrollTop=0;
+  if ($('graph-dialog').open && isAlgorithm(graphState)) $('trace-card').closest('.graph-details').scrollTop=0;
+};
+$('graph-scope').onclick=()=>{
+  graphFull=!graphFull;
+  graphNode=null;
+  $('graph-scope').setAttribute('aria-pressed',String(graphFull));
+  $('graph-scope').textContent=graphFull?ui("Show experiment path"):ui("Show full graph");
+  renderFlow(graphState);
+};
+function zoomMap(factor) {
+  const map=$('node-map'), viewport=$('graph-window');
+  if (!factor) {
+    map.style.width='100%';
+    map.style.minWidth='0';
+    viewport.scrollLeft=0;
+    return;
+  }
+  const current=map.clientWidth;
+  const width=Math.min(Math.max(1800,viewport.clientWidth*2.5),Math.max(280,current*factor));
+  const center=(viewport.scrollLeft+viewport.clientWidth/2)/current;
+  map.style.width=Math.round(width)+'px';
+  map.style.minWidth='0';
+  viewport.scrollLeft=width*center-viewport.clientWidth/2;
+}
+$('graph-smaller').onclick=()=>zoomMap(1/1.2);
+$('graph-larger').onclick=()=>zoomMap(1.2);
+$('graph-fit').onclick=()=>zoomMap(0);
+$('graph-expand').onclick=()=>{
+  const dialog=$('graph-dialog');
+  if (dialog.open) {dialog.close();return}
+  dialog.append($('graph-panel'));
+  $('graph-expand').textContent=ui("Collapse map");
+  dialog.showModal();
+  $('graph-expand').focus();
+};
+$('graph-dialog').addEventListener('close',()=>{
+  $('graph-home').append($('graph-panel'));
+  $('graph-expand').textContent=ui("Expand map");
+  $('graph-expand').focus();
+});
+
+const componentNames=localizedLabels({laser_01:"Laser",detector_01:"Detector",beam_splitter_01:"Beam splitter",mirror_x_01:"X-arm mirror",mirror_y_01:"Y-arm mirror"});
+const fixedColor=['#8ca2bd','#667f9b','#435a74'];
+const movingColors=[['#74d6bf','#4ba691','#306c60'],['#81b8e8','#507fae','#375d80'],['#bca8e4','#8776b3','#5e4d88']];
+const toolColor=['#ffe0a6','#c79151','#936539'];
+let playback = null;
+let playbackKey = null;
+let frameIndex = 0;
+let playing = null;
+let animationId = 0;
+let colors = [];
+
+function pausePlayback() {
+  cancelAnimationFrame(animationId);
+  playing = null;
+  $('play').textContent = ui("Play");
+}
+function resizeCanvas() {
+  const canvas = $('sim-canvas');
+  const ratio = Math.min(window.devicePixelRatio || 1, 2);
+  canvas.width = Math.round(canvas.clientWidth * ratio);
+  canvas.height = Math.round(canvas.clientHeight * ratio);
+  drawFrame();
+}
+function drawFrame() {
+  if (!playback) return;
+  const canvas = $('sim-canvas');
+  const ctx = canvas.getContext('2d');
+  const frame = playback.frames[frameIndex];
+  const expanded = playback.objects.length > 5;
+  const x0 = -.03, x1 = expanded ? .85 : .63;
+  const y0 = -.18, y1 = expanded ? .74 : .53;
+  const midX = (x0+x1)/2, midY = (y0+y1)/2;
+  const scale = Math.min(canvas.width / (expanded ? 1.47 : 1.26), canvas.height / (expanded ? .80 : .69));
+  const center = [canvas.width/2,canvas.height*.53];
+  const project = ([x,y,z]) => [
+    center[0] + scale * (.9*(x-midX) + .6*(y-midY)),
+    center[1] + scale * (.36*(x-midX) - .48*(y-midY) - z),
+  ];
+  function trace(points,stroke,fill) {
+    ctx.beginPath();
+    for (const [i,point] of points.entries()) {
+      const [x,y] = project(point);
+      if (i) ctx.lineTo(x,y);
+      else ctx.moveTo(x,y);
+    }
+    if (fill) {
+      ctx.closePath();
+      ctx.fillStyle = fill;
+      ctx.fill();
+    }
+    if (stroke) {
+      ctx.strokeStyle = stroke;
+      ctx.stroke();
+    }
+  }
+  function box(pose,w,d,h,palette) {
+    const [x,y,z,yaw] = pose;
+    const c = Math.cos(yaw);
+    const s = Math.sin(yaw);
+    const corners = [[-w/2,-d/2],[w/2,-d/2],[w/2,d/2],[-w/2,d/2]]
+      .map(([u,v]) => [x+c*u-s*v,y+s*u+c*v]);
+    const lower = corners.map(xy => [...xy,z-h/2]);
+    const upper = corners.map(xy => [...xy,z+h/2]);
+    const faces = corners.map((_,i) => {
+      const j = (i+1)%4;
+      return {points:[lower[i],lower[j],upper[j],upper[i]],
+        depth:project(lower[i])[1] + project(lower[j])[1],fill:palette[1+i%2]};
+    });
+    faces.sort((a,b) => a.depth-b.depth);
+    for (const face of faces) trace(face.points,'#15232e',face.fill);
+    trace(upper,'#182632',palette[0]);
+    trace([[x,y,z+h/2],[x+c*w*.4,y+s*w*.4,z+h/2]],'#172737');
+  }
+  ctx.clearRect(0,0,canvas.width,canvas.height);
+  ctx.lineWidth = Math.max(1,canvas.width/580);
+  const table = [[x0,y0,0],[x1,y0,0],[x1,y1,0],[x0,y1,0]];
+  trace(table,'#526678','#1c2b39');
+  trace([table[0],table[1],[x1,y0,-.025],[x0,y0,-.025]],'#41576b','#15222e');
+  trace([table[1],table[2],[x1,y1,-.025],[x1,y0,-.025]],'#41576b','#131e2b');
+  for (let x = 0; x < x1; x += .1) trace([[x,y0,0],[x,y1,0]],'#2b3f50');
+  for (let y = -.1; y < y1; y += .1) trace([[x0,y,0],[x1,y,0]],'#2b3f50');
+  const tool = frame.tool;
+  trace([[tool[0],tool[1],0],tool],'#68573e');
+  trace(playback.frames.slice(Math.max(0,frameIndex-34),frameIndex+1).map(row => row.tool),'#af8b5f');
+  const items = frame.poses.map((pose,i) => {
+    const obj = playback.objects[i];
+    return {pose,dimensions:[obj.width_m,obj.depth_m,obj.height_m],palette:colors[i]};
+  });
+  items.push({pose:tool,dimensions:[.020,.020,.012],palette:toolColor});
+  items.sort((a,b) => (.36*a.pose[0] - .48*a.pose[1]) - (.36*b.pose[0] - .48*b.pose[1]));
+  for (const {pose,dimensions,palette} of items) box(pose,...dimensions,palette);
+  const last = playback.frames.at(-1);
+  const t = tick => (tick * playback.step_s).toFixed(2);
+  const time = t(frame.tick);
+  const duration = t(last.tick);
+  $('sim-time').textContent = time + ' / ' + duration + ' s';
+  $('sim-waypoint').textContent = ui("Waypoint completed: ") + frame.waypoint + ' / ' + last.waypoint;
+  $('sim-tool').textContent = ui("Tool XYZ (mm) ") + tool.slice(0,3).map(v => Math.round(v*1000)).join('，');
+  $('scrubber').value = frameIndex;
+  $('scrubber').setAttribute('aria-valuetext',time + ui(" s of ") + duration + ui(" s"));
+}
+function playFrame(now) {
+  if (!playing) return;
+  const tick = playing.tick + (now-playing.startedAt) / (1000*playback.step_s);
+  const previousFrame = frameIndex;
+  while (frameIndex < playback.frames.length-1 && playback.frames[frameIndex+1].tick <= tick) frameIndex++;
+  if (frameIndex !== previousFrame) drawFrame();
+  if (frameIndex === playback.frames.length-1) {
+    pausePlayback();
+    $('play').textContent = ui("Replay");
+  } else {
+    animationId = requestAnimationFrame(playFrame);
+  }
+}
+$('play').onclick = () => {
+  if (!playback) return;
+  if (playing) {
+    pausePlayback();
+    return;
+  }
+  if (frameIndex === playback.frames.length-1) {
+    frameIndex = 0;
+    drawFrame();
+  }
+  playing = {startedAt:performance.now(),tick:playback.frames[frameIndex].tick};
+  $('play').textContent = ui("Pause");
+  animationId = requestAnimationFrame(playFrame);
+};
+$('scrubber').oninput = e => {
+  pausePlayback();
+  frameIndex = Number(e.target.value);
+  drawFrame();
+  if (frameIndex === playback.frames.length-1) $('play').textContent = ui("Replay");
+};
+
+function updatePlayback(s) {
+  const team = s?.mode.startsWith('github_');
+  const evidenceKey = team && s.playback_sha256 && s.verification ? s.run_id + ':' + s.playback_sha256 : null;
+  if (evidenceKey && playbackKey === evidenceKey) return;
+  if (playbackKey !== evidenceKey || !s) {
+    pausePlayback();
+    playbackKey = evidenceKey;
+    playback = null;
+    frameIndex = 0;
+    $('play').disabled = true;
+    $('scrubber').disabled = true;
+    $('scrubber').value = 0;
+    $('sim-legend').replaceChildren();
+    $('sim-time').textContent = '— s';
+    $('sim-waypoint').textContent = '';
+    $('sim-tool').textContent = '';
+    $('sim-canvas').setAttribute('aria-hidden','true');
+    $('playback-status').hidden = false;
+  }
+  if (!evidenceKey) {
+    $('playback-status').textContent = !s ? ui("Replay appears after Output validation")
+      : !team ? ui("Pose replay unavailable in this mode")
+      : s.active || s.status === 'queued' ? ui("Waiting for Sim and Output validation")
+      : s.verification ? ui("Output validation passed. No replay was saved.") : ui("No validated replay for this run");
+    return;
+  }
+  $('playback-status').textContent = ui("Loading validated pose records…");
+  api('/api/runs/' + s.run_id + '/playback').then(data => {
+    if (playbackKey !== evidenceKey) return;
+    if (data.schema_version !== 'mujoco-playback/v1' || data.engine !== 'mujoco' ||
+        data.plan_hash !== s.verification.plan_hash || !data.frames?.length || !data.objects?.length) {
+      throw Error(ui("Unrecognized replay format"));
+    }
+    playback = data;
+    let moving = 0;
+    colors = data.objects.map(object => object.movable ? movingColors[moving++ % movingColors.length] : fixedColor);
+    $('sim-legend').innerHTML = data.objects.map((object,i) =>
+      `<li style="--legend-color:${colors[i][0]}">${esc(componentNames[object.id] || object.id)}${object.movable ? '' : ui(" · Fixed")}</li>`
+    ).join('') + ("<li style=\"--legend-color:#ffe0a6\">"+ui("End effector")+"</li>");
+    $('playback-status').hidden = true;
+    $('sim-canvas').removeAttribute('aria-hidden');
+    $('scrubber').max = data.frames.length - 1;
+    $('scrubber').disabled = false;
+    $('play').disabled = false;
+    resizeCanvas();
+  }).catch(e => {
+    if (playbackKey === evidenceKey) $('playback-status').textContent = ui("Unable to load replay · ") + human(e.message);
+  });
+}
+new ResizeObserver(() => {resizeCanvas()}).observe($('graph-playback'));
+
+const tableSize = [520,285];
+let tableBox = [0,0,...tableSize];
+let tableDrag = null;
+let tableSelection = null;
+let tableGroup = [];
+let tableRun;
+function applyTableBox() {
+  $('algorithm-table').setAttribute('viewBox',tableBox.join(' '));
+}
+function zoomTable(factor) {
+  const [x,y,width,height]=tableBox;
+  const next=Math.min(tableSize[0]*2,Math.max(tableSize[0]/8,width/factor));
+  const nextHeight=next*tableSize[1]/tableSize[0];
+  tableBox=[x+(width-next)/2,y+(height-nextHeight)/2,next,nextHeight];
+  applyTableBox();
+}
+function panTable(dx,dy) {
+  tableBox[0]+=dx; tableBox[1]+=dy;
+  applyTableBox();
+}
+function fitTable() {
+  tableBox=[0,0,...tableSize];
+  applyTableBox();
+}
+function refreshTable() {
+  const rounds=journalFor(graphState,isPrecisionRun(graphState));
+  renderAlgorithm(graphState,rounds,rounds.find(round=>round.key===graphRound));
+}
+function chooseTableGroup(mark) {
+  tableGroup=JSON.parse(mark.dataset.poseGroup);
+  tableSelection=tableGroup.includes(tableSelection)?tableSelection:tableGroup[0];
+  refreshTable();
+}
+const tableSvg=$('algorithm-table');
+tableSvg.addEventListener('click',event=>{
+  const mark=event.target.closest('[data-pose-group]');
+  if (mark && !tableDrag?.moved) chooseTableGroup(mark);
+});
+tableSvg.addEventListener('keydown',event=>{
+  const mark=event.target.closest('[data-pose-group]');
+  if (mark && ['Enter',' '].includes(event.key)) {event.preventDefault();chooseTableGroup(mark);return}
+  const delta=tableBox[2]*.08;
+  const offsets={ArrowLeft:[-delta,0],ArrowRight:[delta,0],ArrowUp:[0,-delta],ArrowDown:[0,delta]};
+  if (offsets[event.key]) {event.preventDefault();panTable(...offsets[event.key]);}
+  else if (event.key==='+' || event.key==='=') {event.preventDefault();zoomTable(1.25)}
+  else if (event.key==='-') {event.preventDefault();zoomTable(.8)}
+});
+tableSvg.addEventListener('pointerdown',event=>{
+  if (event.button!==0 || event.target.closest('[data-pose-group]')) return;
+  tableDrag={id:event.pointerId,x:event.clientX,y:event.clientY,moved:false};
+  tableSvg.setPointerCapture(event.pointerId);
+  tableSvg.setAttribute('data-dragging','');
+});
+tableSvg.addEventListener('pointermove',event=>{
+  if (tableDrag?.id!==event.pointerId) return;
+  const matrix=tableSvg.getScreenCTM();
+  if (!matrix) return;
+  panTable((tableDrag.x-event.clientX)/matrix.a,(tableDrag.y-event.clientY)/matrix.d);
+  tableDrag.x=event.clientX; tableDrag.y=event.clientY; tableDrag.moved=true;
+});
+for (const event of ['pointerup','pointercancel','lostpointercapture']) tableSvg.addEventListener(event,()=>{
+  tableDrag=null;
+  tableSvg.removeAttribute('data-dragging');
+});
+$('table-out').onclick=()=>zoomTable(.8);
+$('table-in').onclick=()=>zoomTable(1.25);
+$('table-fit').onclick=fitTable;
+$('table-supports').onchange=()=>{fitTable();refreshTable()};
+$('table-selection').onchange=event=>{
+  if (!event.target.matches('[data-table-component]')) return;
+  tableSelection=event.target.value || null;
+  if (!tableGroup.includes(tableSelection)) tableGroup=[];
+  refreshTable();
+  $('table-selection').querySelector('[data-table-component]')?.focus();
+};
+function tableExpandLabel() {
+  $('table-expand').textContent=ui($('table-dialog').open?'Close expanded workbench':'Expand workbench');
+}
+$('table-expand').onclick=()=>{
+  const dialog=$('table-dialog');
+  if (dialog.open) {dialog.close();return}
+  dialog.append($('table-workbench'));
+  dialog.showModal();
+  tableExpandLabel();
+  $('table-expand').focus();
+};
+$('table-dialog').addEventListener('close',()=>{
+  $('table-home').append($('table-workbench'));
+  tableExpandLabel();
+  $('table-expand').focus();
+});
+function supportComponent(component) {
+  // Earlier runs used descriptive support kinds and explicit support IDs.
+  const id=String(component?.object_id || '').toLowerCase();
+  if (/^(?:mount_|support_|baseplate_|breadboard_|post_holder_)/.test(id) ||
+      /^(?:table_base|electronics_tray|safety_enclosure)$/.test(id)) return true;
+  const kind=String(component?.kind || '').toLowerCase().replaceAll(/[- ]+/g,'_');
+  if (/^(?:optical_table|support|bracket|fixed_base|post|post_base|mounting_tray|safety_cover)$/.test(kind)) return true;
+  return /^(?:(?:optical|optic|mirror|lens|crystal|detector|laser|post|kinematic)_)?(?:mount|mounting_bracket|post|post_holder|pedestal|baseplate|base_plate|breadboard|optical_table|support|spacer|clamp|bracket|fastener|screw|rail|frame|structure|structural_support)$/.test(kind);
+}
+function renderAlgorithm(s,rounds,selected) {
+  const view=s.algorithm_state;
+  if (tableRun!==s.run_id) {
+    tableRun=s.run_id;
+    tableSelection=null;
+    tableGroup=[];
+    fitTable();
+  }
+  const components=new Map((s.layout?.components || []).map(c=>[c.object_id,c]));
+  for (const c of s.algorithm_experiment?.components || []) components.set(c.object_id,{...components.get(c.object_id),...c});
+  const componentName=id=>{const label=components.get(id)?.label;return label && label!=='…'?label:id;};
+  const componentReadout=id=>componentName(id)===id?id:componentName(id)+' · '+id;
+  const history=s.algorithm_history || [];
+  const calculation=event=>{
+    if (event.stage!=='sim' || event.outcome!=='passed') return null;
+    const hash=event.output_summary?.plan_sha256;
+    return (hash && history.find(row=>row.plan_hash===hash)) || history.find(row=>row.attempt===event.attempt);
+  };
+  const latestCalculation=events=>{
+    for (const event of events.toReversed()) {
+      const calc=calculation(event);
+      if (calc) return calc;
+    }
+    return null;
+  };
+  const calc=selected ? latestCalculation(selected.events) : s.algorithm_result;
+  const prior=selected && !calc ? latestCalculation(rounds.slice(0,rounds.indexOf(selected)).flatMap(r=>r.events)) : null;
+  const poses=selected ? calc?.after || prior?.after || view?.initial || {} : view?.current || {};
+  const targets=Object.assign(Object.create(null),Object.fromEntries((s.layout?.components || []).map(c=>{
+    const pose=c.target_pose;
+    const orientation=pose?.orientation_xyzw;
+    const yaw_rad=orientation?.length===4 ? 2*Math.atan2(orientation[2],orientation[3]) : pose?.yaw_rad;
+    return [c.object_id,pose?{...pose,yaw_rad}:null];
+  })));
+  for (const c of s.algorithm_experiment?.components || []) {
+    if (!targets[c.object_id] && c.position_m) targets[c.object_id]=c;
+  }
+  const moved=new Set(calc?.moved_ids || []);
+  const positionTolerance=calc?.limits?.position_m;
+  const angleTolerance=calc?.limits?.angle_rad;
+  const bad=new Set(calc?.failed_ids || []);
+  for(const [id,value] of Object.entries(calc?.position_errors_m || {})) if (value>positionTolerance) bad.add(id);
+  for(const [id,value] of Object.entries(calc?.angle_errors_rad || {})) if (value>angleTolerance) bad.add(id);
+  const caption=(selected?selected.title+' · ':'')+(calc?.revision!==undefined?ui("Workbench revision ")+calc.revision:
+    selected && prior?ui("Retaining workbench revision ")+prior.revision:
+    !selected && view?.revision!==undefined?ui("Workbench revision ")+view.revision:ui("Waiting for algorithm simulation"))+
+    (moved.size?ui(" · Moved this round: ")+[...moved].join(language==='en'?', ':'、'):'')+
+    (bad.size?ui(" · Out of tolerance: ")+[...bad].join(language==='en'?', ':'、'):'')+
+    (typeof calc?.mechanical_passed==='boolean'?ui(" · Pose: ")+(calc.mechanical_passed?ui("Passed"):ui("Out of tolerance")):'')+
+    (typeof calc?.optical_passed==='boolean'?ui(" · Optical rules: ")+(calc.optical_passed?ui("Passed"):ui("Failed")):'');
+  if ($('algorithm-caption').textContent!==caption) $('algorithm-caption').textContent=caption;
+  const ids=[...new Set([...Object.keys(targets),...Object.keys(poses)])];
+  const rawComponents=lastState && lastState.run_id===s.run_id
+    ? new Map((lastState.algorithm_experiment?.components || []).map(component=>[component.object_id,component]))
+    : null;
+  const structure=ids.filter(id=>supportComponent(rawComponents?.get(id) || components.get(id)));
+  const visible=ids.filter(id=>$('table-supports').checked || !structure.includes(id));
+  const visibleSet=new Set(visible);
+  const shortId=id=>String(ids.indexOf(id)+1);
+  const validPose=pose=>pose?.position_m?.length>=2 && pose.position_m.slice(0,2).every(Number.isFinite);
+  const positions=visible.flatMap(id=>[poses[id],targets[id]].filter(validPose));
+  const connections=(s.algorithm_experiment?.connections || []).filter(edge=>visibleSet.has(edge.from_id)&&visibleSet.has(edge.to_id));
+  if (!visibleSet.has(tableSelection)) {tableSelection=null;tableGroup=[]}
+  const fmt=(v,scale=1)=>Number.isFinite(v)?(v*scale).toFixed(3):'—';
+  const coords=pose=>pose?.position_m?pose.position_m.map(n=>fmt(n,1000)).join(', ')+' / '+fmt(pose.yaw_rad,180/Math.PI)+'°':'—';
+  if (positions.length) {
+    const xs=positions.map(p=>p.position_m[0]), ys=positions.map(p=>p.position_m[1]);
+    const minX=Math.min(...xs), maxX=Math.max(...xs), minY=Math.min(...ys), maxY=Math.max(...ys);
+    const scale=Math.min(425/Math.max(.001,maxX-minX),205/Math.max(.001,maxY-minY));
+    const point=pose=>[260+(pose.position_m[0]-(maxX+minX)/2)*scale,142-(pose.position_m[1]-(maxY+minY)/2)*scale];
+    const groups=new Map();
+    for (const id of visible) {
+      const currentPose=validPose(poses[id])?poses[id]:null;
+      const targetPose=validPose(targets[id])?targets[id]:null;
+      if (!currentPose && !targetPose) continue;
+      const exactOverlap=currentPose && targetPose && point(currentPose).every((value,index)=>value===point(targetPose)[index]);
+      for (const [pose,target] of [[targetPose,true],[currentPose,false]]) {
+        if (!pose || (target && exactOverlap)) continue;
+        const xy=point(pose);
+        const key=JSON.stringify(xy);
+        if (!groups.has(key)) groups.set(key,{xy,entries:[]});
+        groups.get(key).entries.push({id,pose,target});
+      }
+    }
+    const paths=connections.map(edge=>{
+      const from=targets[edge.from_id],to=targets[edge.to_id];
+      if (!validPose(from) || !validPose(to)) return '';
+      const [x1,y1]=point(from),[x2,y2]=point(to);
+      const length=Math.hypot(x2-x1,y2-y1);
+      if (length<1e-6) return '';
+      const selectedEdge=tableSelection===edge.from_id || tableSelection===edge.to_id;
+      const gap=Math.min(8,length/5);
+      const dx=(x2-x1)/length,dy=(y2-y1)/length;
+      return '<line x1="'+(x1+gap*dx)+'" y1="'+(y1+gap*dy)+'" x2="'+(x2-gap*dx)+'" y2="'+(y2-gap*dy)+
+        '" stroke="#bbabe9" opacity="'+(tableSelection&&!selectedEdge ? .22 : 1)+'" stroke-width="'+(selectedEdge?3:1.4)+
+        '" marker-end="url(#algorithm-arrow)"><title>'+esc(edge.role || '')+'</title></line>';
+    }).join('');
+    const occupied=[];
+    const marks=[...groups.values()].map(({xy:[x,y],entries})=>{
+      const groupIds=[...new Set(entries.map(entry=>entry.id))];
+      const selectedMark=groupIds.includes(tableSelection);
+      const entry=entries.find(item=>item.id===tableSelection) || entries.find(item=>!item.target && bad.has(item.id)) ||
+        entries.find(item=>!item.target && moved.has(item.id)) || entries.find(item=>!item.target) || entries[0];
+      const color=bad.has(entry.id)?'#ffad99':moved.has(entry.id)?'#edbc77':entry.target?'#81b8e8':'#99c9b7';
+      const label=groupIds.length>1?'×'+groupIds.length:shortId(entry.id);
+      const showLabel=selectedMark || occupied.every(([px,py])=>Math.abs(px-x)>20 || Math.abs(py-y)>15);
+      if (showLabel) occupied.push([x,y]);
+      const heading=Number.isFinite(entry.pose.yaw_rad)?'<path d="M0 0 L'+(11*Math.cos(entry.pose.yaw_rad))+' '+
+        (-11*Math.sin(entry.pose.yaw_rad))+'" stroke="'+color+'" stroke-width="1.4"/>':'';
+      const titles=groupIds.map(id=>shortId(id)+' · '+componentReadout(id)).join(' / ');
+      return '<g class="algorithm-pose" data-pose-group="'+esc(JSON.stringify(groupIds))+'" transform="translate('+x+' '+y+
+        ')" tabindex="0" role="button" aria-pressed="'+selectedMark+'" aria-label="'+esc(titles)+'"><title>'+esc(titles)+'</title>'+
+        '<circle class="pose-hit" r="11" fill="transparent"/>'+
+        (selectedMark?'<circle r="10" fill="none" stroke="#e9edf2"/>':'')+
+        (entry.target?'<circle r="6" fill="#0c151e" stroke="'+color+'" stroke-dasharray="3 2"/>':
+          '<circle r="'+(groupIds.length>1?6:4)+'" fill="'+color+'"/>')+
+        heading+(showLabel?'<text class="pose-label" x="7" y="-7">'+esc(label)+'</text>':'')+'</g>';
+    }).join('');
+    const defs='<defs><pattern id="table-grid" width="24" height="24" patternUnits="userSpaceOnUse"><path d="M24 0H0V24" fill="none" stroke="#233443"/></pattern><marker id="algorithm-arrow" markerWidth="6" markerHeight="6" refX="5" refY="3" orient="auto"><path d="M0 0L6 3L0 6Z" fill="#bbabe9"/></marker></defs>';
+    replaceContent('algorithm-table',defs+'<rect width="520" height="285" fill="url(#table-grid)"/>'+paths+marks);
+  } else {
+    replaceContent('algorithm-table','<text x="260" y="145" text-anchor="middle" fill="#9ba9b9">'+ui('Waiting for workbench coordinates')+'</text>');
+  }
+  const selectedId=tableSelection;
+  const component=components.get(selectedId);
+  const nearby=tableGroup.filter(id=>visibleSet.has(id));
+  const options=(nearby.length>1?[...nearby,...visible.filter(id=>!nearby.includes(id))]:visible).map(id=>
+    '<option value="'+esc(id)+'"'+(id===selectedId?' selected':'')+'>'+esc(shortId(id)+' · '+componentReadout(id))+'</option>').join('');
+  const selector=visible.length?'<label>'+ui(nearby.length>1?'Components at this location':'Select a component')+
+    '<select data-table-component><option value="">—</option>'+options+'</select></label>':'';
+  const parameters=(component?.parameters || []).map(parameter=>'<li>'+esc([parameter.name,parameter.value,parameter.unit].filter(v=>v!=null).join(' '))+'</li>').join('');
+  const related=connections.filter(edge=>selectedId===edge.from_id || selectedId===edge.to_id).map(edge=>
+    '<li>'+esc(shortId(edge.from_id)+' → '+shortId(edge.to_id)+(edge.role?' · '+edge.role:''))+'</li>').join('');
+  const detail=selectedId?'<strong>'+esc(shortId(selectedId)+' · '+componentReadout(selectedId))+'</strong>'+
+    (component?.role?'<div>'+esc(component.role)+'</div>':'')+
+    '<dl><dt>'+ui('Current mm / °')+'</dt><dd>'+coords(poses[selectedId])+'</dd><dt>'+ui('Target mm / °')+'</dt><dd>'+
+    coords(targets[selectedId])+'</dd></dl>'+(parameters?'<ul>'+parameters+'</ul>':'')+
+    (related?'<strong>'+ui('Connections')+'</strong><ul>'+related+'</ul>':''):'<p>'+ui('Select a marker to inspect its coordinates, parameters, and connections.')+'</p>';
+  replaceContent('table-selection',selector+detail+(!$('table-supports').checked && structure.length
+    ? '<p>'+ui('Hidden supports and structures')+' · '+structure.length+'</p>' : ''));
+  replaceContent('algorithm-evidence',ids.length?("<table><thead><tr><th>"+ui("Component")+"</th><th>"+ui("Current mm / °")+"</th><th>"+ui("Target mm / °")+"</th><th>"+ui("Deviation mm / °")+"</th></tr></thead><tbody>")+
+    ids.map(id=>'<tr><td>'+esc(componentReadout(id))+(bad.has(id)?ui(" · Out of tolerance"):moved.has(id)?ui(" · Moved"):'')+'</td><td>'+coords(poses[id])+'</td><td>'+
+      coords(targets[id])+'</td><td>'+fmt(calc?.position_errors_m?.[id],1000)+' / '+fmt(calc?.angle_errors_rad?.[id],180/Math.PI)+'</td></tr>').join('')+
+    '</tbody></table>':("<p class=\"muted\">"+ui("No coordinate evidence yet.")+"</p>"));
+}
+function opticalTestSummary(suite, report, observed=false) {
+  if (!suite && !report) return '';
+  const tests=new Map((suite?.tests || []).map(test=>[test.id,test]));
+  const results=new Map((report?.tests || []).map(test=>[test.id,test]));
+  const ids=new Set([...tests.keys(),...results.keys()]);
+  const deferred=report?.deferred ?? suite?.deferred ?? [];
+  const status={passed:ui("Passed"),failed:ui("Failed"),invalid:ui("Unable to run")};
+  const operators={approx:ui("Approximately equal to"),le:'≤',ge:'≥'};
+  const title=observed?ui("Simulated pose recheck"):(suite?.title || ui("Design parameter tests"));
+  const outcome=report?.passed===true?ui("Passed"):report?.passed===false?ui("Failed"):ui("Pending");
+  const field=(label,value)=>value==null?'':'<div>'+label+' '+esc(value)+'</div>';
+  const rows=[...ids].map(id=>{
+    const test=tests.get(id), result=results.get(id);
+    const unit=result?.unit ?? test?.unit;
+    const withUnit=value=>value==null?'—':String(value)+(unit?' '+unit:'');
+    const requirementIds=result?.requirement_ids ?? test?.requirement_ids ?? [];
+    const numeric=result?.actual==null?'':' · '+withUnit(result.actual)+' / '+withUnit(result.expected);
+    return '<li><details data-entry="test-'+(observed?'observed-':'design-')+esc(id)+'"><summary><strong>'+
+      esc(result?.title || test?.title || id)+'</strong> · '+esc(status[result?.status] || result?.status || ui("Pending"))+esc(numeric)+
+      '</summary>'+field(ui("Test ID"),id)+
+      field(ui("Requirements"),requirementIds.length?requirementIds.join(language==='en'?', ':'、'):null)+
+      field(ui("Expression"),test?.expression)+
+      field(ui("Expected expression"),test?.expected)+
+      field(ui("Actual"),withUnit(result?.actual))+
+      field(ui("Expected"),(operators[test?.comparison] || '')+' '+withUnit(result?.expected ?? test?.expected))+
+      field(ui("Absolute tolerance"),withUnit(result?.absolute_tolerance ?? test?.absolute_tolerance))+
+      field(ui("Rationale"),test?.rationale)+field(ui("Execution note"),result?.reason)+'</details></li>';
+  }).join('');
+  return '<details data-entry="'+(observed?'optical-test-observed':'optical-test-design')+'"><summary>'+
+    esc(title)+' · '+outcome+' · '+ids.size+(ui(" tests")+"</summary>")+
+    '<p class="muted">'+(observed?ui("Recheck based on simulated poses. The design report is available separately."):ui("Analytic calculations using design parameters."))+
+    (ui(" Physical acceptance requires independent optical and hardware testing.")+"</p>")+
+    (report?.error?'<p class="bad">'+esc(report.error)+'</p>':'')+
+    (rows?'<ul>'+rows+'</ul>':("<p>"+ui("No individual test results to display yet.")+"</p>"))+
+    (deferred.length?("<h4>"+ui("Unverified requirements")+"</h4><ul>")+deferred.map(row=>
+      '<li>'+esc(row.requirement_id)+' · '+esc(row.reason)+'</li>').join('')+'</ul>':'')+'</details>';
+}
+function algorithmExperimentSummary(s) {
+  const {algorithm_experiment:experiment,algorithm_intent:intent,algorithm_review:review}=s;
+  const design=experiment || s.algorithm_design;
+  const tests=opticalTestSummary(s.algorithm_test_suite,s.algorithm_test_report)+
+    (s.algorithm_observed_test_report?opticalTestSummary(s.algorithm_test_suite,s.algorithm_observed_test_report,true):'');
+  if (!design && !intent && !review) return tests;
+  const sources={openai_design:ui("OpenAI design"),agent_design:ui("Agent design"),registered_reference:ui("Historical local rules · Registered reference"),
+    synthetic_request:ui("Historical local rules · Synthetic scene"),user_definition:ui("Historical local rules · User-provided target")};
+  const list=(label,items)=>items?.length?'<h4>'+label+'</h4><ul>'+items.map(item=>'<li>'+item+'</li>').join('')+'</ul>':'';
+  const names=new Map((design?.components || []).map(c=>[c.object_id,c.label || c.object_id]));
+  const text=value=>value?'<p>'+esc(value)+'</p>':'';
+  const expanded=(key,label,value)=>value?'<details data-entry="'+key+'"><summary>'+label+'</summary>'+text(value)+'</details>':'';
+  return '<div class="experiment-summary"><h3>'+esc(design?.title || intent?.title || ui("Experiment requirements"))+'</h3>'+
+    (design?'<p class="muted">'+esc(sources[experiment?.source] || ui("OpenAI design draft"))+' · '+names.size+(ui(" components · Awaiting physical validation")+"</p>"):'')+
+    (experiment?.execution_limits?("<p>"+ui("Simulated pose acceptance: position ≤ "))+esc(Number((experiment.execution_limits.position_m*1000).toPrecision(5)))+
+      (language==='en'?' mm (':' mm（')+(intent?.position_tolerance_m!=null?ui("specified in requirements"):ui("default"))+ui("); angle ≤ ")+
+      esc(Number((experiment.execution_limits.angle_rad*180/Math.PI).toPrecision(5)))+(language==='en'?'° (':'°（')+
+      (intent?.angle_tolerance_rad!=null?ui("specified in requirements"):ui("default"))+(language==='en'?')</p>':'）</p>'):'')+
+    (intent?("<h4>"+ui("Experiment objective interpreted by the model")+"</h4>")+text(intent.objective)+list(ui("Extracted requirements"),
+      intent.requirements?.map(r=>esc(r.id+' · '+r.text)+(r.source_quote && (language!=='en' || r.source_quote!=='…')?(" <small>"+(language==='en'?'(Source: ':ui("(Original: ")))+esc(r.source_quote)+(language==='en'?')</small>':'）</small>'):'')))+
+      list(ui("Requirement assumptions"),intent.assumptions?.map(esc))+list(ui("Questions to clarify"),intent.clarification_questions?.map(esc)):'')+
+    expanded('design-rationale',ui("Design rationale"),design?.rationale)+
+    (design?'<details data-entry="design-details"><summary>'+ui('Design details')+'</summary>':'')+
+    list(ui("Components and parameters"),design?.components?.map(c=>esc([c.label || c.object_id,c.kind,c.role,
+      c.parameters?.map(p=>[p.name,p.value,p.unit].filter(v=>v!==undefined && v!=='').join(' ')).join(language==='en'?', ':'、')].filter(Boolean).join(' · '))))+
+    list(ui("Target optical connections"),design?.connections?.map(c=>esc((names.get(c.from_id) || c.from_id)+' → '+(names.get(c.to_id) || c.to_id)+(c.role?' · '+c.role:''))))+
+    list(ui("Requirements and associated components"),design?.requirements_coverage?.map(r=>esc(r.requirement_id+' · '+(r.component_ids || []).map(id=>names.get(id) || id).join(language==='en'?', ':'、')+' · '+r.explanation)))+
+    list(ui("Design assumptions"),design?.assumptions?.map(esc))+list(ui("Requirements to confirm"),design?.pending_requirements?.map(esc))+(design?'</details>':'')+
+    (review?("<h4>"+ui("Model concept review · "))+(review.accepted?ui("Passed"):ui("Returned"))+'</h4>'+expanded('review-reasoning',ui('Read full explanation'),review.reasoning)+
+      list(ui("Review issues"),review.issues?.map(issue=>esc(typeof issue==='string'?issue:displayJson(issue))))+
+      (!review.accepted && review.return_to?("<p>"+ui("Return to "))+esc(review.return_to)+'</p>':''):'')+tests+'</div>';
+}
+function renderAlgorithmSummary(s) {
+  const checks=s.result?.checks;
+  const labels={conceptual_design:ui("Model concept review"),analytic_design_tests:ui("Design parameter tests"),protocol:ui("Protocol and artifacts"),mechanical_proxy:ui("Pose checks"),optical_proxy:ui("Angle proxy checks"),same_plan:ui("Same-plan handoff")};
+  replaceContent('simulation-summary',algorithmExperimentSummary(s)+
+    ("<h3>"+ui("Scope of algorithm validation")+"</h3><p>"+ui("The algorithm uses synthetic observations to check motion execution, fault recovery, and handoff. Dynamics, the real optical path, and hardware require independent validation.")+"</p>")+
+    (checks?'<table>'+Object.entries(labels).map(([key,label])=>'<tr><th>'+label+'</th><td>'+
+      (checks[key]===true?ui("Passed"):checks[key]===false?ui("Failed"):ui("Not checked"))+'</td></tr>').join('')+'</table>':''));
+}
+function renderSimulation(result) {
+  const container = $('simulation-summary');
+  if (result?.evidence_kind !== 'local_mujoco') {
+    container.textContent = '';
+    return;
+  }
+  const steps = result.steps || [];
+  const recoveryNames = {observation: ui("Observe again"), placement: ui("Repeat pick-and-place")};
+  const corrections = (result.recoveries || []).map(r => recoveryNames[r.layer] + ' · ' + r.object_id);
+  const verified = (result.verifications || []).map(r =>
+    `<tr><td>${esc(r.object_id)}</td><td>${(1000*r.position_error_m).toFixed(3)}</td><td>${(180*r.angle_error_rad/Math.PI).toFixed(3)}</td><td>${r.attempts}</td></tr>`);
+  const rays = result.planar_optical_recheck;
+  const state = lastState;
+  const rounds = (state.sim_history || []).map(r => ("<li>"+ui("Round ")) + r.attempt + ui(" rounds · ") + esc(r.status === 'succeeded' ? ui("Passed") : r.error?.code || ui("Failed")) + '</li>').join('');
+  const diagnoses = (state.repair_history || []).map(r => '<li>' + esc(r.diagnosis) + '</li>').join('');
+  container.innerHTML = `<h3 style="margin-top:20px">${ui("Local simulation record")}</h3>
+    <p>${ui("Completed ")}${steps.filter(s=>s.status==='succeeded').length}${ui("/14 steps · In-plane optical path: ")}${rays ? (rays.passed ? ui("Passed") : ui("Failed")) : ui("Incomplete")}</p>
+    <p class="muted">${corrections.length ? esc(corrections.join('；')) : ui("No corrections recorded")}</p>
+    ${rounds ? '<ul>' + rounds + '</ul>' : ''}
+    ${diagnoses ? ("<h3>"+ui("System diagnosis and revisions")+"</h3><ul>") + diagnoses + '</ul>' : ''}
+    ${verified.length ? ("<table><tr><th>"+ui("Component")+"</th><th>"+ui("Error mm")+"</th><th>"+ui("Error °")+"</th><th>"+ui("Checks")+"</th></tr>")+verified.join('')+'</table>' : ''}`;
+}
+function renderTeam(s) {
+  const container = $('simulation-summary');
+  const receipt = s.verification;
+  if (isPrecisionRun(s) && (usesSameTable(s) || s.attempts?.precision_sim || precisionExecutions.has(s.live_node))) {
+    const repairs = (s.precision_repairs || []).map(row =>
+      ("<li>"+ui("Round ")) + esc(row.failed_attempt) + ui(" rounds · ") + esc(teamLabels[row.agent]) + ' · ' +
+      esc(row.failure_code) + ' · ' + esc(row.diagnosis) + ' · ' + esc(row.model || row.provider) +
+      (s.precision_attempt_artifacts ? ' · <a download href="/api/runs/' + encodeURIComponent(s.run_id) +
+        '/precision/report?attempt=' + encodeURIComponent(row.failed_attempt) +
+        (" target=\"_blank\" rel=\"noopener\">View failure report"+"</a>") : '') + '</li>');
+    const accepted = receipt?.scope === 'rgb_robot_and_lightpipes' ?
+      ("<p>"+ui("Independent mechanical acceptance and the LightPipes optical check both passed.")+"</p>") : '';
+    container.innerHTML = accepted + (repairs.length ? ("<h3>"+ui("Autonomous node corrections")+"</h3><ul>") + repairs.join('') + '</ul>' : '');
+    return;
+  }
+  const reasons = {retry_allowed:ui("Retry allowed"),target_retry_limit:ui("Node retry budget exhausted"),total_retry_limit:ui("Total retry budget exhausted"),route_not_allowed:ui("No eligible automatic correction path")};
+  const rounds = (s.retry_log || []).map(row => '<tr><td>' + esc(teamLabels[row.from] || row.from) + '</td><td>' + esc(row.code) + '</td><td>' + esc(row.to === 'stop' ? ui("Stop") : teamLabels[row.to] || row.to) + '</td><td>' + esc(reasons[row.reason] || ui("Legacy record")) + (row.total_retries !== undefined ? ' · ' + esc(row.total_retries) + '/' + esc(row.total_limit) : '') + '</td></tr>').join('');
+  const details = receipt ? ("<p>"+ui("Accepted ROSi SHA-256")+"</p><pre>") + esc(receipt.plan_hash) + '</pre>' : '';
+  const l1 = ['local_l1_dry_run','local_precision_l1_dry_run'].includes(s.result?.mode) ?
+    ("<p>"+ui("L1 received the Output hash · 0 motion commands")+"</p>") : '';
+  const wave = receipt?.wave_optics;
+  const waveSummary = wave?.passed ? ("<p>"+ui("LightPipes recalculated the optical path using this round's placement. All checks passed.")+"</p>") : '';
+  container.innerHTML = ("<h3>"+ui("GitHub workflow record")+"</h3>") + waveSummary + details + l1 +
+    (rounds ? ("<table><tr><th>"+ui("Failed node")+"</th><th>"+ui("Error")+"</th><th>"+ui("Return to")+"</th><th>"+ui("Routing reason · Budget used")+"</th></tr>") + rounds + '</table>' : '');
+}
+let graphKind, graphDefinitionSource;
+function renderGraphDefinition() {
+  if(graphDefinitionSource) $('graph').textContent=human(graphDefinitionSource);
+}
+async function loadGraph(team,algorithm=false) {
+  const key=definitionKey(team,algorithm);
+  if (graphKind === key) return;
+  graphKind = key;
+  try {
+    const data = await api('/api/graph?team=' + team + (algorithm?'&algorithm=true':''));
+    if (graphKind === key) {
+      graphDefinitionSource=data.mermaid;
+      renderGraphDefinition();
+      graphDefinitions.set(key, [...data.mermaid.matchAll(/^\s*(\w+) (?:-->|-\.->) (\w+);/gm)].map(([,from,to]) => [from,to]));
+      renderFlow(lastState ? displayCopy(lastState) : emptyFlow);
+    }
+  } catch (e) {
+    if (graphKind === key) {graphKind = undefined; $('graph').textContent=ui("Unable to read LangGraph definition. Retrying.");}
+  }
+}
+function showPrecision(s) {
+  const section = $('precision-evidence');
+  const progress = measuredProgress(s);
+  const recorded = s.precision_attempt_dirs?.length || s.attempts?.precision_sim;
+  const verification = s.verification;
+  const precise = isPrecisionRun(s) && (s.active || recorded);
+  const video = $('precision-video');
+  $('cartesian-replay').hidden = !!precise || isAlgorithm(s);
+  $('algorithm-view').hidden = !isAlgorithm(s);
+  $('playback-title').textContent = isAlgorithm(s) ? ui("Algorithm workbench") : ui("MuJoCo replay");
+  $('precision-replay').hidden = !precise;
+  section.hidden = !precise;
+  if (!precise) {
+    if (video.hasAttribute('src')) { video.removeAttribute('src'); video.load(); }
+    return;
+  }
+  $('precision-video-status').textContent = verification?.video_sha256 ? ui("Final acceptance replay · MuJoCo simulation round ")+recorded+ui("")
+    : verification?.video_error || (s.active ? ui("Replay will be generated after mechanical and optical acceptance") : ui("No acceptance replay generated for this round"));
+  const phases = {assembly:ui("RGB localization and pick-and-place"),final_camera_check:ui("Recheck each component"),mechanical_stage_completed:ui("Optical alignment"),
+    feedback_stage_completed:ui("Independent optical acceptance"),completed:ui("Simulation complete"),failed:ui("Simulation stopped"),completed_with_quality_failure:ui("Acceptance failed")};
+  const rows = (progress?.placements || []).flatMap(row => row.attempts.map((a, i) =>
+    `<tr><td>${esc(row.name)}</td><td>${i + 1}</td><td>${a.position_mm.toFixed(3)}</td><td>${a.rotation_deg.toFixed(3)}</td></tr>`));
+  const inherited=progress?.measurement==='placement' &&
+    (liveRepairTargets(s).length || s.precision_result?.recovery?.retained_scene===true);
+  const contact=progress?.protective_contact;
+  const contactText=contact?.geoms?.length===2 && Number.isFinite(contact.distance_m) ?
+    ui(" · Protection triggered: ")+contact.geoms.join(' ↔ ')+' · '+(contact.distance_m*1000).toFixed(3)+' mm' : '';
+  $('precision-progress').textContent = progress ? (progress.motion_phase ? precisionPhaseText(s,progress) : phases[progress.phase] || progress.phase) +
+    ' · ' + progress.completed + '/' + progress.required + (progress.measurement === 'mechanical' ? ui(" components passed mechanical acceptance") : progress.measurement === 'final_visual' ? ui(" components passed full-table visual recheck") : inherited ? ui(" components have original assembly records") : ui(" components passed initial placement recheck")) +
+    (progress.failure ? ' · ' + progress.failure : '') + contactText : ui("Loading camera and robot records…");
+  $('precision-attempts').innerHTML = rows.length ? ("<table><thead><tr><th>"+ui("Component")+"</th><th>"+ui("Pick-and-place attempts")+"</th><th>"+ui("Deviation mm")+"</th><th>"+ui("Angular deviation °")+"</th></tr></thead><tbody>") +
+    rows.join('') + '</tbody></table>' : '';
+  const plans = (progress?.transfer_plans || []).map(row =>
+    '<li>' + esc(row.label.split(':')[0]) + ' · ' + (row.motion === 'parking' ? ui("Return") : ui("Transfer")) + ' · ' +
+    (row.rejected ? ui("Rejected ") + esc(row.rejected) + ui(" candidates and returned to planning · ") : '') +
+    (row.accepted ? ui("Selected ") + esc(row.waypoints) + ui(" joint trajectory segments") : ui("Planning failed. Motion stopped.")) + '</li>');
+  $('precision-transfer-plans').hidden = !plans.length;
+  $('precision-transfer-plan-list').innerHTML = plans.join('');
+  const base = '/api/runs/' + s.run_id + '/precision/';
+  const labels = {report:ui("Full simulation report"), log:ui("Run log"), camera:ui("Fixed camera A"), camera_b:ui("Fixed camera B"),
+    wrist:ui("Wrist camera"), camera_c:ui("Fixed camera C"), observations:ui("Image localization records"), truth:ui("Actual placement records"), audit:ui("Independent mechanical and final optical diagnosis"), optics:ui("Optical feedback"), beam:ui("Simulated beam spot")};
+  const artifacts = s.precision_artifacts || (recorded ? ['report','camera',...(progress?.optical_feedback === 'passed' ? ['beam'] : [])] : []);
+  $('precision-links').innerHTML = artifacts.filter(artifact => labels[artifact]).map(artifact =>
+    '<a href="' + base + artifact + '" download>' + labels[artifact] + '</a>').join(' · ');
+  video.hidden = !verification?.video_sha256;
+  if (!video.hidden && video.getAttribute('src') !== base + 'video') video.src = base + 'video';
+  if (video.hidden && video.hasAttribute('src')) { video.removeAttribute('src'); video.load(); }
+}
+function render(raw){
+  const prior=lastState;
+  lastState=raw;
+  missingPresentationText.clear();
+  const s=displayCopy(language==='en' && raw.events
+    ? {...raw,events:raw.events.map(event=>({...event,message:eventMessage(event)}))}
+    : raw);
+  renderFlow(s);
+  const algorithm=isAlgorithm(s);
+  const team=algorithm || s.mode.startsWith('github_');
+  if (!algorithm || !isAlgorithm(prior)) updatePlayback(algorithm?null:s);
+  showPrecision(s);
+  if (algorithm) renderAlgorithmSummary(s);
+  else {
+    renderSimulation(s.result);
+    if (team) renderTeam(s);
+  }
+  loadGraph(team,algorithm);
+  updateRunControls(raw);
+  $('status').textContent=stateLabel(s);
+  $('kind').textContent=algorithm
+    ? ui(s.algorithm_experiment && !['openai_design','agent_design'].includes(s.algorithm_experiment.source)?'Historical algorithm workflow record':s.decider?(s.decider.title || 'Local CLI')+' design · Algorithm execution':'Model design · Algorithm execution')
+    : team ? s.scene?.registration?.title || ui('MuJoCo · Full test')
+      : s.profile?.startsWith('legacy') ? ui(s.result?.historical?'Historical record':'Fixed-case simulation')
+        : ui(({mock:'Protocol simulation',design:'Design and rule checks',local_sim:'MuJoCo dynamics and planar optics'})[s.mode] || 'Remote service');
+  $('run-id').textContent=s.run_id.slice(0,12);
+  $('summary').textContent=s.algorithm_intent?.objective || s.intent?.summary || s.request;
+  $('events').innerHTML=(s.events || []).map(e=>{
+    const name=(algorithm?algorithmNames[e.stage]:null) || (team?teamLabels:labels)[e.stage] || e.stage;
+    return '<li><span>'+esc(name)+'</span>'+esc(eventMessage(e))+'</li>';
+  }).join('');
+  $('review-controls').style.display=s.status==='awaiting_review'?'block':'none';
+  $('continue').style.display=!algorithm&&!s.active&&['interrupted','running','queued'].includes(s.status)?'block':'none';
+  $('error').style.display=s.error?'block':'none';
+  $('error').textContent=s.error?displayJson(s.error):'';
+  $('layout').textContent=displayJson({intent:s.intent,layout:s.layout});
+  $('validation').textContent=displayJson({layout:s.validation,plan:s.plan_validation});
+  $('plan').textContent=displayJson({sha256:s.plan_sha256,file:s.plan_path,plan:s.plan});
+  $('result').textContent=displayJson(s.result || s.verification || s.manifest || {});
+  $('components').innerHTML=s.layout?'<h3>'+ui('Target coordinates · Meters')+'</h3><table><tr><th>'+ui('Object')+
+    '</th><th>'+ui('Position')+'</th><th>'+ui('Movable')+'</th></tr>'+(s.layout.components || []).map(component=>{
+      const position=component.target_pose?.position_m?.map(n=>Number(n.toFixed(4))).join(', ') || '—';
+      return '<tr><td>'+esc(component.object_id)+'</td><td>'+esc(position)+'</td><td>'+ui(component.movable?'Yes':'Fixed')+'</td></tr>';
+    }).join('')+'</table>':'';
+  showTranslationStatus();
+  renderDecider(raw);
+  updateAgentOverlay(raw);
+}
+// "Agent working" overlay. The selected run counts as working while a worker executes it, while it is queued, and
+// while it waits for an agent decision. The animation is decorative and shows no run data.
+const agentOverlay={shown:false,dismissed:null,frame:null,hideTimer:0};
+const reduceMotion=matchMedia('(prefers-reduced-motion: reduce)');
+const agentWorking=s=>!!s && (s.active || ['queued','awaiting_decision'].includes(s.status));
+function haloflux(call){
+  try {const listener=agentOverlay.frame?.contentWindow?.wallpaperPropertyListener; if (listener) call(listener);} catch {}
+}
+function updateAgentOverlay(s){
+  const working=agentWorking(s) && !reduceMotion.matches;
+  if (!working) agentOverlay.dismissed=null;  // the next time a run starts working, show it again
+  const show=working && agentOverlay.dismissed!==s.run_id;
+  if (show) {
+    feedHaloflux(s);
+    $('agent-overlay-run').textContent=$('status').textContent+' · '+$('stage').textContent;
+    $('agent-overlay-decider').textContent=s.decider?.state==='thinking' || s.decider?.state==='rejected' ? deciderText(s.decider) : '';
+  }
+  if (show===agentOverlay.shown) return;
+  agentOverlay.shown=show;
+  const el=$('agent-overlay');
+  clearTimeout(agentOverlay.hideTimer);
+  if (show) {
+    if (!agentOverlay.frame) {
+      const frame=document.createElement('iframe');
+      frame.src='/haloflux/';
+      frame.title='HALOFLUX animation';
+      frame.tabIndex=-1;
+      frame.setAttribute('aria-hidden','true');
+      frame.addEventListener('load',()=>{
+        haloflux(listener=>{
+          listener.applyUserProperties({music:{value:false},showui:{value:false}});
+          listener.setPaused(!agentOverlay.shown);
+        });
+        haloFed.vocab=haloFed.checks=haloFed.tempo=null;
+        feedHaloflux(lastState);
+      });
+      el.prepend(frame);
+      agentOverlay.frame=frame;
+    } else haloflux(listener=>listener.setPaused(false));
+    requestAnimationFrame(()=>requestAnimationFrame(()=>el.classList.add('on')));
+  } else {
+    el.classList.remove('on');
+    agentOverlay.hideTimer=setTimeout(()=>haloflux(listener=>listener.setPaused(true)),1000);
+  }
+}
+// Live run data for the optics-modified animation (vendor/haloflux/optics.html, window.OPTICS). Only real values
+// from the run are shown: its status, its design's component ids, parameters and target x, its test expressions,
+// its requirements and the decision being made. Bursts mark a node passing, flares a feedback-router reroute.
+const haloFed={run:null,events:0,vocab:null,checks:null,tempo:null};
+function feedHaloflux(s){
+  let o;
+  try {o=agentOverlay.frame?.contentWindow?.OPTICS;} catch {return;}
+  if (!o || !s) return;
+  try {
+    const d=s.decider, thinking=d?.state==='thinking';
+    o.setStatus(($('stage').textContent || '').toUpperCase()+' · '+($('status').textContent || ''),
+      thinking ? deciderText(d) : 'simulated workbench · no hardware moves');
+    const comps=s.algorithm_experiment?.components || [], tests=s.algorithm_test_suite?.tests || [];
+    const vocabKey=s.run_id+':'+(s.algorithm_experiment?.design_sha256 || '')+':'+tests.length;
+    if (comps.length && vocabKey!==haloFed.vocab) {
+      haloFed.vocab=vocabKey;
+      o.setVocab({
+        head: comps.map(c=>(c.object_id+' · '+String(c.kind || '').replace(/_/g,' ')).toUpperCase()),
+        pairs: comps.flatMap(c=>[...(c.parameters || []).map(p=>[c.object_id+' '+p.name,p.value+' '+p.unit]),
+          ...(Array.isArray(c.position_m) ? [[c.object_id+' x',(c.position_m[0]*1000).toFixed(1)+' mm']] : [])]),
+        code: tests.length ? tests.flatMap(t=>[t.id,String(t.expression || '')]) : undefined,
+      });
+    }
+    const live=[...(thinking ? [[(d.title || 'Agent')+' · '+(deciderRoles[d.role] || d.role),d.model || '']] : []),
+      ...(s.algorithm_intent?.requirements || []).slice(0,4).map(r=>['REQ '+r.id,r.text])];
+    const checksKey=JSON.stringify(live);
+    if (checksKey!==haloFed.checks) {haloFed.checks=checksKey; o.setChecks(live);}
+    const tempo=thinking ? 1.1 : 0.6;
+    if (tempo!==haloFed.tempo) {haloFed.tempo=tempo; o.setTempo(tempo);}
+    const events=s.events || [];
+    if (haloFed.run!==s.run_id) {haloFed.run=s.run_id; haloFed.events=events.length;}
+    for (const e of events.slice(haloFed.events))
+      o.pulse(e.stage==='feedback_router' ? 'reroute' : /passed/.test(e.message || '') ? 'pass' : '');
+    haloFed.events=events.length;
+  } catch {}
+}
+function dismissAgentOverlay(){
+  if (!agentOverlay.shown) return;
+  agentOverlay.dismissed=lastState?.run_id ?? null;
+  updateAgentOverlay(lastState);
+}
+$('agent-overlay-hide').onclick=dismissAgentOverlay;
+document.addEventListener('keydown',e=>{if (e.key==='Escape') dismissAgentOverlay();});
+let refreshSequence = 0;
+let appliedSequence = 0;
+async function refresh() {
+  const id = current;
+  if (!id) return;
+  const sequence = ++refreshSequence;
+  const state = await api('/api/runs/' + id);
+  if (id !== current || sequence < appliedSequence) return;
+  appliedSequence = sequence;
+  $('connection').hidden=true;
+  render(state);
+  void refreshPresentation();
+}
+const experimentExamples={
+  kepler:"Design a Keplerian telescope with a 200 mm objective and a 50 mm eyepiece. Specify the lens separation and angular magnification, and verify the output is approximately collimated.",
+  michelson:"Build a Michelson interferometer with a 632.8 nm laser, a 50:50 beam splitter, two mirrors, and a detector. Set each arm to 150 mm and verify the round-trip optical path difference and recombination conditions.",
+  opa:"Design a degenerate optical parametric amplifier. Combine a 532 nm pump and a 1064 nm seed at the same nonlinear crystal. Give computable beam waist and spatial overlap criteria, and identify acceptance checks that need measurements."
+};
+$('experiment-samples').addEventListener('click',event=>{
+  const example=event.target.closest('[data-example]')?.dataset.example;
+  if (!example) return;
+  $('request').value=experimentExamples[example];
+  $('request').focus();
+});
+$('start').onclick = async () => {
+  const request = $('request').value.trim();
+  if (!request) {
+    toast(ui("Enter experiment requirements"));
+    $('request').focus();
+    return;
+  }
+  try {
+    $('start').disabled = true;
+    const choice=$('decider').value;
+    const r = cliTitles[choice]
+      ? await api('/api/experiments/cli-runs', {request,output_language:language,decider:choice})
+      : await api('/api/experiments/runs', {request,output_language:language});
+    selectRun(r.run_id);
+    toast(ui("Run created"));
+    await refresh();
+    await refreshHistory();
+  } catch (e) {
+    toast(e.message);
+  } finally {
+    $('start').disabled = false;
+  }
+};
+$('save').onclick=async()=>{try{await api('/api/settings',{model:$('model').value,api_key:$('api-key').value});$('api-key').value='';await settings();toast(ui("Local settings saved"))}catch(e){toast(e.message)}};
+async function review(approved) {
+  const state = lastState;
+  if (state?.run_id !== current || state.status !== 'awaiting_review' || state.active) return;
+  try {
+    await api('/api/runs/'+state.run_id+'/review',{approved,plan_sha256:state.plan_sha256});
+    toast(ui("Review decision submitted"));
+    await refresh();
+  } catch(e) {
+    toast(e.message);
+  }
+}
+$('approve').onclick=()=>review(true);$('reject').onclick=()=>review(false);$('continue').onclick=async()=>{try{await api('/api/runs/'+current+'/continue',{});toast(ui("Resuming"))}catch(e){toast(e.message)}};
+let pendingControl=null;
+function updateRunControls(s) {
+  const local=isAlgorithm(s), matching=pendingControl?.id===s.run_id;
+  const pending=matching?pendingControl.action:s.display_state==='resuming'?'continue':s.control_request || ({pause_requested:'pause',stop_requested:'stop'})[s.status];
+  const canPause=s.active || ['queued','running','pause_requested'].includes(s.status);
+  const canResume=!s.active && ['paused','interrupted','running','queued'].includes(s.status);
+  const canStop=canPause || canResume || s.status==='stop_requested';
+  $('run-controls').hidden=!local || !canStop;
+  $('pause-run').disabled=!canPause || !!pending;
+  $('resume-run').disabled=!canResume || !!pending;
+  $('stop-run').disabled=!canStop || !!matching || pending==='stop';
+  const early=s.display_state==='waiting_for_worker' && !matching;  // a continue is queued: the request wins before any node runs
+  $('control-note').textContent=early&&pending==='stop'?ui("Stop requested: will take effect before the run resumes"):early&&pending==='pause'?ui("Pause requested: will take effect before the run resumes"):
+    pending==='stop'?ui("Will stop at the next node boundary"):pending==='pause'?ui("Will pause at the next node boundary"):
+    pending==='continue'?ui("Resuming"):s.status==='paused'?ui("Progress saved. Resume to start the next node."):ui("Pause and stop take effect between nodes");
+}
+async function controlRun(action) {
+  const state=lastState;
+  if (pendingControl || !isAlgorithm(state) || state.run_id!==current) return;
+  pendingControl={id:state.run_id,action};
+  updateRunControls(state);
+  try {
+    await api('/api/runs/'+encodeURIComponent(state.run_id)+'/'+action,{});
+    await refresh();
+  } catch(e) {
+    toast(e.message);
+  } finally {
+    pendingControl=null;
+    if(lastState?.run_id===current) updateRunControls(lastState);
+  }
+}
+$('pause-run').onclick=()=>controlRun('pause');
+$('resume-run').onclick=()=>controlRun('continue');
+$('stop-run').onclick=()=>controlRun('stop');
+async function pollRun() {
+  try { await refresh(); } catch (e) { $('connection').hidden=false; }
+  if (graphKind===undefined) loadGraph((lastState || emptyFlow).mode.startsWith('github_'),isAlgorithm(lastState || emptyFlow));
+  setTimeout(pollRun,lastState?.active || lastState?.status === 'queued' ? 400 : 1100);
+}
+for (const select of languageSelects) select.addEventListener('change',()=>{
+  language = 'en';
+  try { localStorage.setItem(languageKey,language); } catch {}
+  renderLanguage();
+  renderGraphDefinition();
+  renderModelSettings();
+  if (historyRows) renderHistory(historyRows);
+  $('graph-scope').textContent = ui(graphFull?'Show experiment path':'Show full graph');
+  $('graph-expand').textContent = ui($('graph-dialog').open?'Collapse map':'Expand map');
+  tableExpandLabel();
+  if (lastState) {render(lastState);void refreshPresentation();}
+  else renderFlow(emptyFlow);
+  if (playback) {
+    $('play').textContent = ui(playing?'Pause':frameIndex===playback.frames.length-1?'Replay':'Play');
+    resizeCanvas();
+  }
+});
+renderLanguage();
+renderFlow(emptyFlow);
+loadGraph(true,true);
+Promise.all([settings(),refreshHistory()]).catch(e => toast(e.message));
+setTimeout(pollRun,400);
+setInterval(() => refreshHistory().catch(() => {}),3000);
+</script></body></html>

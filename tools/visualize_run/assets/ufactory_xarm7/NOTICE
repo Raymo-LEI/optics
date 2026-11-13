@@ -1,0 +1,8 @@
+xArm7 MJCF model and meshes
+===========================
+Source:   https://github.com/google-deepmind/mujoco_menagerie, directory ufactory_xarm7
+Model:    UFACTORY xArm7 (MJCF derived from UFACTORY's public xArm URDF)
+Copyright (c) 2018, UFACTORY Inc. Redistributed under the license in the file LICENSE
+(BSD-3-Clause wording). The files in this directory are an unmodified copy of that
+Menagerie directory (scene.xml is kept for completeness; render_run.py loads xarm7.xml
+and builds its own scene). The Menagerie README.md is included as shipped.

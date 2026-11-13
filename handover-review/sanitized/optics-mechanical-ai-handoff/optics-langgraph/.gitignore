@@ -1,0 +1,8 @@
+.venv/
+config/local.json
+data/
+__pycache__/
+.pytest_cache/
+*.egg-info/
+*.pyc
+data-mcp/

@@ -1,0 +1,21 @@
+{
+  "mcpServers": {
+    "optics-runs-panel": {
+      "type": "http",
+      "url": "http://127.0.0.1:8766/mcp",
+      "headers": {
+        "x-optics-local": "1"
+      }
+    },
+    "optics-evidence-panel": {
+      "command": "${OPTICS_PROJ:-handover-review/sanitized/optics-mechanical-ai-handoff/optics-langgraph}/.venv/bin/python",
+      "args": [
+        "-m",
+        "optics_graph.mcp_evidence"
+      ],
+      "env": {
+        "OPTICS_MCP_DATA_DIR": "${OPTICS_PROJ:-handover-review/sanitized/optics-mechanical-ai-handoff/optics-langgraph}/data"
+      }
+    }
+  }
+}
