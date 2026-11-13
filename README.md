@@ -1,6 +1,6 @@
 # Optics workbench
 
-A local optics LangGraph workbench (the received handoff package) plus an agent layer on top of it: skills, MCP servers, web panel changes, and a kinematic run visualizer. Everything here is a simulation. No camera, robot, or optical measurement is connected, and `physical_verified` is false.
+A local optics LangGraph workbench (the mechanical/AI handoff package) plus an agent layer on top of it: skills, MCP servers, web panel changes, and a kinematic run visualizer. Everything here is a simulation. No camera, robot, or optical measurement is connected, and `physical_verified` is false.
 
 This repository is runnable from a clone. API keys, `config/local.json`, virtual environments, run records (`data/`, `data-mcp/`, `demo-output/`) and the original handoff ZIP stay on the machine that produced them. See License below before using it outside noncommercial work.
 
