@@ -6,14 +6,15 @@ This repository is runnable from a clone. API keys, `config/local.json`, virtual
 
 ## Quick start
 
-Needs macOS or Linux (Windows: WSL2) and Python 3.12.
+Needs macOS or Linux (Windows: WSL2) and Python 3.12 (`python3.12` on PATH; with uv, `uv python install 3.12` then `uv venv --python 3.12 .venv`).
 
 ```sh
+tools/print-codex-config.sh > .codex/config.toml   # from the repo root, once per machine; the tests check it
 cd handover-review/sanitized/optics-mechanical-ai-handoff/optics-langgraph
 python3.12 -m venv .venv
 .venv/bin/python -m pip install -r requirements.lock.txt -r requirements-mcp.txt
 .venv/bin/python -m pip install -e . --no-deps
-.venv/bin/python -m pytest -q          # offline, no API key needed
+.venv/bin/python -m pytest -q          # offline, no API key needed; expect no failures
 .venv/bin/python handoff_demo.py       # offline fixture closed loop
 .venv/bin/python -m optics_graph.cli serve --port 8766   # web panel
 ```
