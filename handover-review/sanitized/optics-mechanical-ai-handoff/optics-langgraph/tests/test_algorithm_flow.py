@@ -140,7 +140,9 @@ def test_zero_response_stops_at_retry_budget(tmp_path, option, target):
     assert state["status"] == "failed"
     assert state["retry_log"][-1]["reason"] == "target_retry_limit"
     assert routes(state)[-1] == ("output", "stop")
-    assert state["retry_counts"][target] == state["retry_log"][-1]["retry_limit"]
+    key = state["retry_log"][-1]["retry_key"]  # placement repairs count per part, e.g. "controller:L25"
+    assert key.startswith(target + ":") and target not in state["retry_counts"]
+    assert state["retry_counts"][key] == state["retry_log"][-1]["retry_limit"] == 2  # the part still stops at 2
     assert "execution" not in state["attempts"]
     assert state["result"] is None
 
